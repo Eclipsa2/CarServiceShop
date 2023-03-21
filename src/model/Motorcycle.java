@@ -50,4 +50,12 @@ public class Motorcycle extends Vehicle{
     public void setTransmissionType(String transmissionType) {
         this.transmissionType = transmissionType;
     }
+
+    @Override
+    public String toString()
+    {
+        return (super.toString() +
+                "\nTotal mass of motorcycle: " + this.totalMass +
+                "\nTransmission type of motorcycle: " + this.transmissionType);
+    }
 }

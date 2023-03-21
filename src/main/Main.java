@@ -19,14 +19,16 @@ public class Main {
         System.out.println("5. Fire an Employee");
         System.out.println("-------------------------------------------------");
         System.out.println("6. Add a new car in the service");
-        System.out.println("7. Change car status");
-        System.out.println("8. See all repaired cars");
-        System.out.println("9. Resoft a car (add more horsepower)");
+        System.out.println("7. See all cars currently in the shop");
+        System.out.println("8. Change car status");
+        System.out.println("9. See all repaired cars");
+        System.out.println("10. Resoft a car (add more horsepower)");
         System.out.println("-------------------------------------------------");
-        System.out.println("10. Add a new motorcycle in the service");
-        System.out.println("11. Change motorcycle status");
-        System.out.println("12. See all repaired motorcycles");
-        System.out.println("13. Resoft a motorcycle (add more horsepower)");
+        System.out.println("11. Add a new motorcycle in the service");
+        System.out.println("12. See all motorcycles currently in the shop");
+        System.out.println("13. Change motorcycle status");
+        System.out.println("14. See all repaired motorcycles");
+        System.out.println("15. Resoft a motorcycle (add more horsepower)");
         System.out.println("-------------------------------------------------");
         System.out.println("0. Exit");
 
@@ -34,7 +36,7 @@ public class Main {
         String stringOption = inputScanner.nextLine();
         int option = Integer.parseInt(stringOption);
 
-        while(option > 13)
+        while(option > 15)
         {
             System.out.println("\n Please enter a valid option!");
             stringOption = inputScanner.nextLine();
@@ -102,6 +104,60 @@ public class Main {
                 case 6:
                 {
                     RepairShopService.addNewCar();
+                    option = menu();
+                    break;
+                }
+                case 7:
+                {
+                    RepairShopService.printAllCarsInShop();
+                    option = menu();
+                    break;
+                }
+                case 8:
+                {
+                    RepairShopService.changeCarStatus();
+                    option = menu();
+                    break;
+                }
+                case 9:
+                {
+                    RepairShopService.printAllRepairedCars();
+                    option = menu();
+                    break;
+                }
+                case 10:
+                {
+                    RepairShopService.addHorsePowerToCar();
+                    option = menu();
+                    break;
+                }
+                case 11:
+                {
+                    RepairShopService.addNewMotorcycle();
+                    option = menu();
+                    break;
+                }
+                case 12:
+                {
+                    RepairShopService.printAllMotorcyclesInShop();
+                    option = menu();
+                    break;
+                }
+                case 13:
+                {
+                    RepairShopService.changeMotorcycleStatus();
+                    option = menu();
+                    break;
+                }
+                case 14:
+                {
+                    RepairShopService.printAllRepairedMotorcycles();
+                    option = menu();
+                    break;
+                }
+                case 15:
+                {
+                    RepairShopService.addHorsePowerToMotorcycle();
                     option = menu();
                     break;
                 }

@@ -33,7 +33,6 @@ public class Employee extends Person implements Comparable<Employee>
         return (
                 "Name: " + this.getName() +
                 "\nFirst Name: " + this.getFirstName() +
-                "\nLast Name: " + this.getName() +
                 "\nPhone Number: " + this.getPhoneNumber() +
                 "\nSalary: " + this.salary
         );

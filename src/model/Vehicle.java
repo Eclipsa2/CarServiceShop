@@ -38,18 +38,32 @@ public abstract class Vehicle
         }
     }
 
+    public void resoftVehicle(int addedHorsePower)
+    {
+        this.horsePower += addedHorsePower;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        return (this.getRegistrationNumber().equals(((Vehicle)o).getRegistrationNumber()));
+    }
     @Override
     public String toString()
     {
         if (this.isRepaired == true)
-            return ("The vehicle with the registration number: " + this.registrationNumber
+            return ("\nThe vehicle with the registration number: " + this.registrationNumber
             + " and the color " + this.color + " has been repaired and is owned by "
             + this.owner.getName() + " " + this.owner.getFirstName() + " with the phone number "
-            + this.owner.getPhoneNumber());
-        return ("The vehicle with the registration number: " + this.registrationNumber
+            + this.owner.getPhoneNumber() + "\nHorse Power: " + this.horsePower +
+            "\nRepaired by: " + this.employee.getName()
+            + " " + employee.getFirstName() + "\nRepair cost: " + this.total);
+        return ("\nThe vehicle with the registration number: " + this.registrationNumber
                 + " and the color " + this.color + " hasn't been repaired and is owned by "
                 + this.owner.getName() + " " + this.owner.getFirstName() + " with the phone number "
-                + this.owner.getPhoneNumber());
+                + this.owner.getPhoneNumber() + "\nHorse Power: " + this.horsePower +
+                "\nRepaired by: " + this.employee.getName()
+                + " " + employee.getFirstName() + "\nRepair cost: " + this.total);
     }
 
     //region GETTERS AND SETTERS
