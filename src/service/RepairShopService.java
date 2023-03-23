@@ -6,6 +6,8 @@ import java.util.*;
 
 public class RepairShopService
 {
+    private User owner;
+    private String shopName;
     private static List<Client> clients = new ArrayList<Client>();
     private static PriorityQueue<Employee> employees = new PriorityQueue<Employee>();
     private static List<Car> carsInShop = new ArrayList<Car>();
@@ -13,6 +15,12 @@ public class RepairShopService
     private static List<Motorcycle> motorcyclesInShop = new ArrayList<Motorcycle>();
     private static List<Motorcycle> repairedMotorcycles = new ArrayList<Motorcycle>();
     private static Scanner inputScanner = new Scanner(System.in);
+
+    public RepairShopService(User owner, String shopName)
+    {
+        this.owner = owner;
+        this.shopName = shopName;
+    }
 
     public static void registerNewClient()
     {
@@ -411,5 +419,14 @@ public class RepairShopService
         }
         if(ok == 0) System.out.println("The motorcycle with that registration number was not found!");
         else System.out.println("\nThe motorcycle has been resofted!");
+    }
+
+    public String getShopName() {
+        return shopName;
+    }
+
+    public User getOwner()
+    {
+        return owner;
     }
 }

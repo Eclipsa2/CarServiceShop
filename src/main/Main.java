@@ -1,8 +1,7 @@
 package main;
 
-import com.sun.source.tree.Tree;
 import model.*;
-import service.RepairShopService;
+import service.ShopMenu;
 
 import java.util.*;
 
@@ -30,7 +29,7 @@ public class Main {
         System.out.println("14. See all repaired motorcycles");
         System.out.println("15. Resoft a motorcycle (add more horsepower)");
         System.out.println("-------------------------------------------------");
-        System.out.println("0. Exit");
+        System.out.println("0. Log out");
 
         Scanner inputScanner = new Scanner(System.in);
         String stringOption = inputScanner.nextLine();
@@ -46,10 +45,28 @@ public class Main {
         return option;
     }
 
-    public static int menu2()
+    public static int menuLogin()
     {
-        //asdasda
-        return 1;
+        System.out.println("\n-------------------------------------------------");
+        System.out.println("Welcome!");
+        System.out.println("-------------------------------------------------");
+        System.out.println("1. Login");
+        System.out.println("2. Register");
+        System.out.println("-------------------------------------------------");
+        System.out.println("0. Exit");
+
+        Scanner inputScanner = new Scanner(System.in);
+        String stringOption = inputScanner.nextLine();
+        int option = Integer.parseInt(stringOption);
+
+        while(option > 3)
+        {
+            System.out.println("\n Please enter a valid option!");
+            stringOption = inputScanner.nextLine();
+            option = Integer.parseInt(stringOption);
+        }
+
+        return option;
     }
     public static void main(String[] args)
     {
@@ -69,105 +86,58 @@ public class Main {
         //endregion
 
         Scanner inputScanner = new Scanner(System.in);
-        String name, firstName, aux;
-        int option = menu();
+        String name, aux;
 
-        while (option != 0)
+        List <User> users = new ArrayList<User>();
+
+        int option = menuLogin();
+        while(option != 0)
         {
             switch (option)
             {
                 case 1:
                 {
-                    RepairShopService.registerNewClient();
-                    option = menu();
+                    int ok = 0;
+                    User userAux = new User("","");
+
+                    while(ok != 1)
+                    {
+                        System.out.println("Please enter the username: ");
+                        name = inputScanner.nextLine();
+                        System.out.println("Please enter the password: ");
+                        aux = inputScanner.nextLine();
+                        userAux = new User(name, aux);
+
+                        for(int i = 0; i < users.size(); ++i)
+                        {
+                            if(users.get(i).equals(userAux))
+                            {
+                                option = ShopMenu.mainMenu();
+                                ok = 1;
+                                break;
+                            }
+                        }
+                        if(ok == 0)
+                        {
+                            System.out.println("The login credentials are wrong!");
+                            System.out.println("Try again!");
+                        }
+                    }
                     break;
                 }
                 case 2:
                 {
-                    RepairShopService.printAllClients();
-                    option = menu();
-                    break;
-                }
-                case 3:
-                {
-                    RepairShopService.hireEmployee();
-                    option = menu();
-                    break;
-                }
-                case 4:
-                {
-                    RepairShopService.printAllEmployees();
-                    option = menu();
-                    break;
-                }
-                case 5:
-                {
-                    RepairShopService.fireEmployee();
-                    option = menu();
-                    break;
-                }
-                case 6:
-                {
-                    RepairShopService.addNewCar();
-                    option = menu();
-                    break;
-                }
-                case 7:
-                {
-                    RepairShopService.printAllCarsInShop();
-                    option = menu();
-                    break;
-                }
-                case 8:
-                {
-                    RepairShopService.changeCarStatus();
-                    option = menu();
-                    break;
-                }
-                case 9:
-                {
-                    RepairShopService.printAllRepairedCars();
-                    option = menu();
-                    break;
-                }
-                case 10:
-                {
-                    RepairShopService.addHorsePowerToCar();
-                    option = menu();
-                    break;
-                }
-                case 11:
-                {
-                    RepairShopService.addNewMotorcycle();
-                    option = menu();
-                    break;
-                }
-                case 12:
-                {
-                    RepairShopService.printAllMotorcyclesInShop();
-                    option = menu();
-                    break;
-                }
-                case 13:
-                {
-                    RepairShopService.changeMotorcycleStatus();
-                    option = menu();
-                    break;
-                }
-                case 14:
-                {
-                    RepairShopService.printAllRepairedMotorcycles();
-                    option = menu();
-                    break;
-                }
-                case 15:
-                {
-                    RepairShopService.addHorsePowerToMotorcycle();
-                    option = menu();
+                    System.out.println("Please enter the username: ");
+                    name = inputScanner.nextLine();
+                    System.out.println("Please enter the password: ");
+                    aux = inputScanner.nextLine();
+                    User userAux = new User(name, aux);
+
+                    users.add(userAux);
+                    option = menuLogin();
                     break;
                 }
             }
         }
-
     }
 }
