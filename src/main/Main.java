@@ -46,6 +46,11 @@ public class Main {
         return option;
     }
 
+    public static int menu2()
+    {
+        //asdasda
+        return 1;
+    }
     public static void main(String[] args)
     {
         //region initialization of some cars
