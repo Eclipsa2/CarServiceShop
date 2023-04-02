@@ -38,6 +38,20 @@ public abstract class Vehicle
         }
     }
 
+    public void payRepairs()
+    {
+        if (owner.getStoreCredit() < total)
+        {
+            System.out.println("The client does not have enough store credit to pay for the repair! ");
+        }
+        else
+        {
+            owner.addStoreCredit(-total);
+            System.out.println("The repairs for this vehicle have been paid!");
+            total = 0;
+        }
+    }
+
     public void resoftVehicle(int addedHorsePower)
     {
         this.horsePower += addedHorsePower;
@@ -53,14 +67,14 @@ public abstract class Vehicle
     {
         if (this.isRepaired == true)
             return ("\nThe vehicle with the registration number: " + this.registrationNumber
-            + " and the color " + this.color + " has been repaired and is owned by "
-            + this.owner.getName() + " " + this.owner.getFirstName() + " with the phone number "
+            + " and the color " + this.color + " has been repaired." + "\nOwned by: "
+            + this.owner.getName() + " " + this.owner.getFirstName() + "\nOwner Phone number: "
             + this.owner.getPhoneNumber() + "\nHorse Power: " + this.horsePower +
             "\nRepaired by: " + this.employee.getName()
-            + " " + employee.getFirstName() + "\nRepair cost: " + this.total);
+            + " " + employee.getFirstName() + "\nRepair cost: " + this.total );
         return ("\nThe vehicle with the registration number: " + this.registrationNumber
-                + " and the color " + this.color + " hasn't been repaired and is owned by "
-                + this.owner.getName() + " " + this.owner.getFirstName() + " with the phone number "
+                + " and the color " + this.color + " hasn't been repaired yet." + "\nOwned by: "
+                + this.owner.getName() + " " + this.owner.getFirstName() + "\nOwner Phone number: "
                 + this.owner.getPhoneNumber() + "\nHorse Power: " + this.horsePower +
                 "\nRepaired by: " + this.employee.getName()
                 + " " + employee.getFirstName() + "\nRepair cost: " + this.total);

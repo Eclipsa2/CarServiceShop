@@ -11,31 +11,37 @@ public class Main {
         System.out.println("\n-------------------------------------------------");
         System.out.println("Welcome to our Vehicles Service!");
         System.out.println("-------------------------------------------------");
-        System.out.println("1. Register new Client");
-        System.out.println("2. See all clients");
-        System.out.println("3. Register new Employee");
-        System.out.println("4. See all Employees");
-        System.out.println("5. Fire an Employee");
+        System.out.println("1. HR management");
+        System.out.println("2. Client management");
+        System.out.println("3. Car repairs");
+        System.out.println("4. Motorcycle repairs");
+//        System.out.println("1. Register new Client");
+//        System.out.println("2. See all clients");
+//        System.out.println("3. Add store credit to client");
+//        System.out.println("4. Pay Repairs");
+//        System.out.println("5. Register new Employee");
+//        System.out.println("6. See all Employees");
+//        System.out.println("7. Fire an Employee");
+//        System.out.println("-------------------------------------------------");
+//        System.out.println("8. Add a new car in the service");
+//        System.out.println("9. See all cars currently in the shop");
+//        System.out.println("10. Change car status");
+//        System.out.println("11. See all repaired cars");
+//        System.out.println("12. Resoft a car (add more horsepower)");
+//        System.out.println("-------------------------------------------------");
+//        System.out.println("13. Add a new motorcycle in the service");
+//        System.out.println("14. See all motorcycles currently in the shop");
+//        System.out.println("15. Change motorcycle status");
+//        System.out.println("16. See all repaired motorcycles");
+//        System.out.println("17. Resoft a motorcycle (add more horsepower)");
         System.out.println("-------------------------------------------------");
-        System.out.println("6. Add a new car in the service");
-        System.out.println("7. See all cars currently in the shop");
-        System.out.println("8. Change car status");
-        System.out.println("9. See all repaired cars");
-        System.out.println("10. Resoft a car (add more horsepower)");
-        System.out.println("-------------------------------------------------");
-        System.out.println("11. Add a new motorcycle in the service");
-        System.out.println("12. See all motorcycles currently in the shop");
-        System.out.println("13. Change motorcycle status");
-        System.out.println("14. See all repaired motorcycles");
-        System.out.println("15. Resoft a motorcycle (add more horsepower)");
-        System.out.println("-------------------------------------------------");
-        System.out.println("0. Log out");
+        System.out.println("0. Exit app");
 
         Scanner inputScanner = new Scanner(System.in);
         String stringOption = inputScanner.nextLine();
         int option = Integer.parseInt(stringOption);
 
-        while(option > 15)
+        while(option > 4)
         {
             System.out.println("\n Please enter a valid option!");
             stringOption = inputScanner.nextLine();

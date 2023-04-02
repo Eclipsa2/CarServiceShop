@@ -6,8 +6,6 @@ import java.util.*;
 
 public class RepairShopService
 {
-    private User owner;
-    private String shopName;
     private static List<Client> clients = new ArrayList<Client>();
     private static PriorityQueue<Employee> employees = new PriorityQueue<Employee>();
     private static List<Car> carsInShop = new ArrayList<Car>();
@@ -16,12 +14,85 @@ public class RepairShopService
     private static List<Motorcycle> repairedMotorcycles = new ArrayList<Motorcycle>();
     private static Scanner inputScanner = new Scanner(System.in);
 
-    public RepairShopService(User owner, String shopName)
+    public static void dataInitialization()
     {
-        this.owner = owner;
-        this.shopName = shopName;
-    }
+        clients.add(new Client("Ilie", "Andrei", 123456789));
+        clients.add(new Client("Ilie", "Virgil", 123456789));
+        clients.add(new Client("Anton", "Marius", 123456789));
 
+        employees.add(new Employee("Nicolae", "Anemtoaicei", 123456789, 2500));
+        employees.add(new Employee("Daldo", "Delevigne", 123456789, 3700));
+        employees.add(new Employee("Pomelo", "Necsoiu", 123456789, 2900));
+
+        Issue[] issues1 = new Issue[2];
+        issues1[0] = new Issue("Engine Problems", 2000);
+        issues1[1] = new Issue("Sofware Problems", 500);
+
+        Issue[] issues2 = new Issue[3];
+        issues2[0] = new Issue("Body work", 1200);
+        issues2[1] = new Issue("Injector problems", 700);
+        issues2[2] = new Issue("Winter Tyres Change", 300);
+
+        Car car1 = new Car("B27FLG", "grey", 2022,
+                130, clients.get(0), employees.peek(), issues1,
+                "Volkswagen", "Golf VIII");
+
+        Car car2 = new Car("B127HWT", "white", 2011,
+                80, clients.get(1), employees.peek(), issues2,
+                "Ford", "Focus MK.2");
+
+        Car car3 = new Car("B102BBU", "grey", 2020,
+                90, clients.get(2), employees.peek(), issues1,
+                "Hyundai", "I20");
+
+        Car car4 = new Car("IF23QWR", "yellow", 2023,
+                420, clients.get(0), employees.peek(), issues1,
+                "Mercedes-Benz", "AMG A45S");
+
+        Car car5 = new Car("CT183BWR", "blue", 2017,
+                100, clients.get(1), employees.peek(), issues2,
+                "Hyundai", "Tucson");
+
+        Car car6 = new Car("B73HLO", "green", 2020,
+                220, clients.get(2), employees.peek(), issues1,
+                "BMW", "320i");
+
+        Car car7 = new Car("CT20HEV", "blue", 2021,
+                650, clients.get(1), employees.peek(), issues2,
+                "Audi", "RS6");
+
+        carsInShop.add(car1);
+        carsInShop.add(car2);
+        carsInShop.add(car3);
+        carsInShop.add(car4);
+
+        repairedCars.add(car5);
+        repairedCars.add(car6);
+        repairedCars.add(car7);
+
+        Motorcycle motorcycle1 = new Motorcycle("B123ABC", "black", 2023,
+                230, clients.get(0), employees.peek(), issues1,
+                "Yamaha", "YZF R", 300, "6 Speed Double Clutch");
+
+        Motorcycle motorcycle2 = new Motorcycle("B23QPQ", "orange", 2019,
+                125, clients.get(1), employees.peek(), issues2,
+                "BMW", "Zonda", 276, "6 Speed Simple Clutch");
+
+        Motorcycle motorcycle3 = new Motorcycle("CT75AQP", "white", 2015,
+                120, clients.get(2), employees.peek(), issues2,
+                "Suzuki", "Max 123", 300, "6 Speed Double Clutch");
+
+        Motorcycle motorcycle4 = new Motorcycle("CT951AOL", "black", 2023,
+                170, clients.get(0), employees.peek(), issues1,
+                "Yamaha", "H123Q", 220, "6 Speed Double Clutch");
+
+        motorcyclesInShop.add(motorcycle1);
+        motorcyclesInShop.add(motorcycle2);
+
+        repairedMotorcycles.add(motorcycle3);
+        repairedMotorcycles.add(motorcycle4);
+
+    }
     public static void registerNewClient()
     {
         String firstName, name, aux;
@@ -50,6 +121,53 @@ public class RepairShopService
         }
     }
 
+    public static void addStoreCredit() {
+        Client clientAux = new Client();
+        int ok = 0;
+        while (ok != 1) {
+            System.out.println("Please enter the name of the client: ");
+            String clientName = inputScanner.nextLine();
+            System.out.println("Please enter the first name of the client: ");
+            String clientFirstName = inputScanner.nextLine();
+            clientAux = new Client(clientName, clientFirstName, 123);
+            for (int i = 0; i < clients.size(); ++i) {
+                if (clients.get(i).equals(clientAux)) {
+                    ok = 1;
+
+                    System.out.println("\nHow much store credit do you want to add to " + clients.get(i).getName() + " "
+                            + clients.get(i).getFirstName() + "'s balance?");
+                    int toBeAddedStoreCredit = Integer.parseInt(inputScanner.nextLine());
+                    clients.get(i).addStoreCredit(toBeAddedStoreCredit);
+
+                    break;
+                }
+            }
+            if (ok == 0) {
+                System.out.println("Please enter a valid client!");
+            }
+        }
+    }
+
+    public static void repairVehicle()
+    {
+        String registrationNumber;
+        System.out.println("\nPlease enter the registration number of the car: ");
+        registrationNumber = inputScanner.nextLine();
+        Car auxCar = new Car();
+        auxCar.setRegistrationNumber(registrationNumber);
+
+        int ok = 0;
+        for(int i = 0; i < carsInShop.size(); ++i)
+        {
+            if(carsInShop.get(i).equals(auxCar))
+            {
+                ok = 1;
+                carsInShop.get(i).payRepairs();
+                break;
+            }
+        }
+        if(ok == 0) System.out.println("The car with that registration number was not found!");
+    }
     public static void hireEmployee()
     {
         String firstName, name, aux;
@@ -206,12 +324,12 @@ public class RepairShopService
         auxCar.setRegistrationNumber(registrationNumber);
 
         int ok = 0;
-        for(int i = 0; i <= carsInShop.size(); ++i)
+        for(int i = 0; i < carsInShop.size(); ++i)
         {
             if(carsInShop.get(i).equals(auxCar))
             {
                 ok = 1;
-
+                carsInShop.get(i).setRepaired(true);
                 auxCar = carsInShop.get(i);
                 carsInShop.remove(i);
                 repairedCars.add(auxCar);
@@ -241,7 +359,7 @@ public class RepairShopService
         auxCar.setRegistrationNumber(registrationNumber);
 
         int ok = 0;
-        for(int i = 0; i <= carsInShop.size(); ++i)
+        for(int i = 0; i < carsInShop.size(); ++i)
         {
             if(carsInShop.get(i).equals(auxCar))
             {
@@ -369,12 +487,12 @@ public class RepairShopService
         auxMotorcycle.setRegistrationNumber(registrationNumber);
 
         int ok = 0;
-        for(int i = 0; i <= motorcyclesInShop.size(); ++i)
+        for(int i = 0; i < motorcyclesInShop.size(); ++i)
         {
             if(motorcyclesInShop.get(i).equals(auxMotorcycle))
             {
                 ok = 1;
-
+                motorcyclesInShop.get(i).setRepaired(true);
                 auxMotorcycle = motorcyclesInShop.get(i);
                 motorcyclesInShop.remove(i);
                 repairedMotorcycles.add(auxMotorcycle);
@@ -405,7 +523,7 @@ public class RepairShopService
         auxMotorcycle.setRegistrationNumber(registrationNumber);
 
         int ok = 0;
-        for(int i = 0; i <= motorcyclesInShop.size(); ++i)
+        for(int i = 0; i < motorcyclesInShop.size(); ++i)
         {
             if(motorcyclesInShop.get(i).equals(auxMotorcycle))
             {
@@ -421,12 +539,5 @@ public class RepairShopService
         else System.out.println("\nThe motorcycle has been resofted!");
     }
 
-    public String getShopName() {
-        return shopName;
-    }
 
-    public User getOwner()
-    {
-        return owner;
-    }
 }
