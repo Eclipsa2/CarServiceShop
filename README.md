@@ -11,7 +11,8 @@ First of all you have to login:
 
 In the shop you can do multiple actions:
 
-<img width="506" alt="Screenshot 2023-04-03 at 12 59 06" src="https://user-images.githubusercontent.com/54707251/229477342-74683c45-be1f-4e1e-b61d-a181709c10d0.png">
+<img width="504" alt="Screenshot 2023-04-03 at 19 57 56" src="https://user-images.githubusercontent.com/54707251/229577388-5f7e37aa-76a5-4a07-8aaf-2a0b8cfeebf6.png">
+
 
 Depending on which type of operations the user would like to do you have multiple operations. In the Hr management submenu you can see all employes, fire someone or hire one:
 
@@ -34,3 +35,14 @@ Example of 2 clients that have not paid their repairs:
 The car repairs and motorcycle repairs are similar. The only difference is the type of vehicles and motorcycles having some more attributes to their name. The change car status option will repair the car, but not automatically pay the repairs for the car. Resofting a car will just tune the vehicle and add the desired number of horsepower to the vehicle.
 
 <img width="511" alt="Screenshot 2023-04-03 at 18 29 10" src="https://user-images.githubusercontent.com/54707251/229556570-39b5cc58-072a-45ba-8dd3-f2255051fa37.png">
+
+The statistics submenu offers two options. The first option asks the user for the name of a county and then prints all the vehicles that have the plate number from that one.
+
+<img width="498" alt="Screenshot 2023-04-03 at 20 00 19" src="https://user-images.githubusercontent.com/54707251/229577783-7c4daa11-8554-4aa2-824b-d654fd4a4920.png">
+
+The second option offers some general stats regarding the cars and repairs of the shop:
+Example:
+
+<img width="510" alt="Screenshot 2023-04-03 at 20 02 41" src="https://user-images.githubusercontent.com/54707251/229578270-485a2195-6010-40d4-8eb8-b975b4ff8ead.png">
+
+
