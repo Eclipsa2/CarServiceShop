@@ -12,11 +12,12 @@ public class Employee extends Person implements Comparable<Employee>
     @Override
     public int compareTo(Employee employee)
     {
-        if(this.getSalary() > employee.getSalary())
-            return 1;
-        else if(this.getSalary() < employee.getSalary())
-            return -1;
-        return 0;
+        return (this.salary - employee.getSalary());
+//        if(this.getSalary() > employee.getSalary())
+//            return 1;
+//        else if(this.getSalary() < employee.getSalary())
+//            return -1;
+//        return 0;
     }
 
     @Override
@@ -31,8 +32,7 @@ public class Employee extends Person implements Comparable<Employee>
     public String toString()
     {
         return (
-                "Name: " + this.getName() +
-                "\nFirst Name: " + this.getFirstName() +
+                "First Name: " + this.getFirstName() +
                 "\nPhone Number: " + this.getPhoneNumber() +
                 "\nSalary: " + this.salary
         );

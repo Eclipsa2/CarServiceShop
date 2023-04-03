@@ -15,6 +15,7 @@ public class Main {
         System.out.println("2. Client management");
         System.out.println("3. Car repairs");
         System.out.println("4. Motorcycle repairs");
+        System.out.println("5. Statistics");
 //        System.out.println("1. Register new Client");
 //        System.out.println("2. See all clients");
 //        System.out.println("3. Add store credit to client");
@@ -41,7 +42,7 @@ public class Main {
         String stringOption = inputScanner.nextLine();
         int option = Integer.parseInt(stringOption);
 
-        while(option > 4)
+        while(option > 5)
         {
             System.out.println("\n Please enter a valid option!");
             stringOption = inputScanner.nextLine();

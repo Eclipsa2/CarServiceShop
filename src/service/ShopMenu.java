@@ -49,6 +49,19 @@ public class ShopMenu {
 
         return readOption(4);
     }
+
+    public static int statisticsMenu()
+    {
+        System.out.println("-------------------------------------------------");
+        System.out.println("1. Get the number of cars from a specific county");
+        System.out.println("2. General statistics");
+        System.out.println("-------------------------------------------------");
+        System.out.println("0. Main menu");
+        System.out.println("-------------------------------------------------");
+
+        return readOption(2);
+    }
+
     public static int hrMenu()
     {
         System.out.println("-------------------------------------------------");
@@ -225,6 +238,35 @@ public class ShopMenu {
                             {
                                 RepairShopService.addHorsePowerToMotorcycle();
                                 optionSubmenu = motorcycleRepairsMenu();
+                                break;
+                            }
+                        }
+                    }
+                    option = Main.menu();
+                    break;
+                }
+                case 5:
+                {
+                    int optionSubmenu = statisticsMenu();
+                    while(optionSubmenu != 0)
+                    {
+                        switch (optionSubmenu)
+                        {
+                            case 1:
+                            {
+                                RepairShopService.searchVehiclesFromCounty();
+                                optionSubmenu = statisticsMenu();
+                                break;
+                            }
+                            case 2:
+                            {
+                                System.out.println("-------------------------------------------------");
+                                System.out.println("General Statistics: ");
+                                System.out.println("-------------------------------------------------");
+                                RepairShopService.getAverageRepairCost();
+                                RepairShopService.percentageOfShop_RepairedVehicles();
+                                RepairShopService.percentageOfCars_Motorcycles();
+                                optionSubmenu = statisticsMenu();
                                 break;
                             }
                         }

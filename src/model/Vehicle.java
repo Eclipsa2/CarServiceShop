@@ -65,19 +65,33 @@ public abstract class Vehicle
     @Override
     public String toString()
     {
+        String deReturnat = "";
         if (this.isRepaired == true)
-            return ("\nThe vehicle with the registration number: " + this.registrationNumber
+            deReturnat = "\nThe vehicle with the registration number: " + this.registrationNumber
             + " and the color " + this.color + " has been repaired." + "\nOwned by: "
             + this.owner.getName() + " " + this.owner.getFirstName() + "\nOwner Phone number: "
-            + this.owner.getPhoneNumber() + "\nHorse Power: " + this.horsePower +
-            "\nRepaired by: " + this.employee.getName()
-            + " " + employee.getFirstName() + "\nRepair cost: " + this.total );
-        return ("\nThe vehicle with the registration number: " + this.registrationNumber
-                + " and the color " + this.color + " hasn't been repaired yet." + "\nOwned by: "
-                + this.owner.getName() + " " + this.owner.getFirstName() + "\nOwner Phone number: "
-                + this.owner.getPhoneNumber() + "\nHorse Power: " + this.horsePower +
-                "\nRepaired by: " + this.employee.getName()
-                + " " + employee.getFirstName() + "\nRepair cost: " + this.total);
+            + this.owner.getPhoneNumber() + "\nHorse Power: " + this.horsePower
+            + "\nRepaired by: " + this.employee.getName()
+            + " " + employee.getFirstName() + "\nRepair cost: " + this.total
+            + "\nIssues: ";
+
+        else
+        {
+            deReturnat = "\nThe vehicle with the registration number: " + this.registrationNumber
+                    + " and the color " + this.color + " hasn't been repaired yet." + "\nOwned by: "
+                    + this.owner.getName() + " " + this.owner.getFirstName() + "\nOwner Phone number: "
+                    + this.owner.getPhoneNumber() + "\nHorse Power: " + this.horsePower +
+                    "\nRepaired by: " + this.employee.getName()
+                    + " " + employee.getFirstName() + "\nRepair cost: " + this.total
+                    + "\nIssues: ";
+        }
+
+        for(Issue issue : issues)
+        {
+            deReturnat += "\n" + issue.getIssueName() + " - " + issue.getPrice();
+        }
+
+        return deReturnat;
     }
 
     //region GETTERS AND SETTERS

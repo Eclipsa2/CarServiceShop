@@ -1,7 +1,10 @@
 package model;
 
+import java.util.List;
+
 public class Client extends Person
 {
+    private int leftToBePaid = 0;
     private int storeCredit = 0;
     private boolean paidRepairs = false;
 
@@ -28,16 +31,53 @@ public class Client extends Person
                 &&
                 this.getName().equals(((Client)o).getName()));
     }
+    public void leftToBePaid(List<Car> carsInShop, List<Car> repairedCars,
+                             List <Motorcycle> motorcyclesInShop, List <Motorcycle> repairedMotorcycles)
+    {
+        for(Car car : carsInShop)
+        {
+            if(car.getOwner() == this)
+            {
+                leftToBePaid += car.getTotal();
+            }
+        }
 
+        for(Motorcycle motorcycle : motorcyclesInShop)
+        {
+            if(motorcycle.getOwner() == this)
+            {
+                leftToBePaid += motorcycle.getTotal();
+            }
+        }
+
+        for(Car car : repairedCars)
+        {
+            if(car.getOwner() == this)
+            {
+                leftToBePaid += car.getTotal();
+            }
+        }
+
+        for(Motorcycle motorcycle : repairedMotorcycles)
+        {
+            if(motorcycle.getOwner() == this)
+            {
+                leftToBePaid += motorcycle.getTotal();
+            }
+        }
+
+        if(leftToBePaid == 0) paidRepairs = true;
+        else paidRepairs = false;
+    }
     @Override
     public String toString()
     {
         return (
-                "Name: " + this.getName() +
                 "\nFirst Name: " + this.getFirstName() +
                 "\nLast Name: " + this.getName() +
                 "\nPhone Number: " + this.getPhoneNumber() +
                 "\nCurrent Balance: " + storeCredit + " euro" +
+                "\nLeft to be paid to the service: " + leftToBePaid + " euro " +
                 "\nPaid Services: " + this.paidRepairs
                 );
     }

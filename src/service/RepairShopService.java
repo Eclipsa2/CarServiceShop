@@ -3,6 +3,7 @@ package service;
 import model.*;
 
 import java.util.*;
+import java.util.regex.*;
 
 public class RepairShopService
 {
@@ -23,6 +24,7 @@ public class RepairShopService
         employees.add(new Employee("Nicolae", "Anemtoaicei", 123456789, 2500));
         employees.add(new Employee("Daldo", "Delevigne", 123456789, 3700));
         employees.add(new Employee("Pomelo", "Necsoiu", 123456789, 2900));
+        employees.add(new Employee("a", "a", 123456789, 9000000));
 
         Issue[] issues1 = new Issue[2];
         issues1[0] = new Issue("Engine Problems", 2000);
@@ -116,6 +118,7 @@ public class RepairShopService
 
         for(int i = 0; i < clients.size(); ++i)
         {
+            clients.get(i).leftToBePaid(carsInShop, repairedCars, motorcyclesInShop, repairedMotorcycles);
             System.out.println("-------------------------------------------------");
             System.out.println(clients.get(i));
         }
@@ -190,13 +193,21 @@ public class RepairShopService
     public static void printAllEmployees()
     {
         System.out.println("\nThese are all the employees of this Shop: ");
+        PriorityQueue<Employee> auxEmployees = new PriorityQueue<Employee>();
+        Employee aux = new Employee();
 
-        Iterator<Employee> iterate = employees.iterator();
-        while (iterate.hasNext())
+        for(int i = 0; i <= employees.size(); ++i)
         {
+            aux = employees.poll();
+
             System.out.println("-------------------------------------------------");
-            System.out.println("\n" + iterate.next());
+            System.out.println("\n" + aux);
+
+            auxEmployees.add(aux);
         }
+
+        for(int i = 0; i <= auxEmployees.size(); ++i)
+            employees.add(auxEmployees.poll());
     }
 
     public static void fireEmployee()
@@ -539,5 +550,116 @@ public class RepairShopService
         else System.out.println("\nThe motorcycle has been resofted!");
     }
 
+    public static void searchVehiclesFromCounty()
+    {
+        int counter = 0;
 
+        String county;
+        System.out.println("\nPlease enter the desired county:");
+        county = inputScanner.nextLine();
+
+        System.out.println("\nThese are all the vehicles from the county: ");
+
+        String regex = county + "[0-9]+[A-Za-z]+";
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+
+        for(Car car : carsInShop)
+        {
+            Matcher matcher = pattern.matcher(car.getRegistrationNumber());
+            if(matcher.find())
+            {
+                ++counter;
+                System.out.println("-------------------------------------------------");
+                System.out.println(car);
+            }
+        }
+
+        for(Motorcycle motorcycle : motorcyclesInShop)
+        {
+            Matcher matcher = pattern.matcher(motorcycle.getRegistrationNumber());
+            if(matcher.find())
+            {
+                ++counter;
+                System.out.println("-------------------------------------------------");
+                System.out.println(motorcycle);
+            }
+        }
+
+        for(Car car : repairedCars)
+        {
+            Matcher matcher = pattern.matcher(car.getRegistrationNumber());
+            if(matcher.find())
+            {
+                ++counter;
+                System.out.println("-------------------------------------------------");
+                System.out.println(car);
+            }
+        }
+
+        for(Motorcycle motorcycle : repairedMotorcycles)
+        {
+            Matcher matcher = pattern.matcher(motorcycle.getRegistrationNumber());
+            if(matcher.find())
+            {
+                ++counter;
+                System.out.println("-------------------------------------------------");
+                System.out.println(motorcycle);
+            }
+        }
+
+        if (counter == 0) System.out.println("No vehicles from that county were found");
+
+    }
+
+    public static void getAverageRepairCost()
+    {
+        int total = 0;
+        int counter = 0;
+
+        for(Car car : carsInShop)
+        {
+            ++counter;
+            total += car.getTotal();
+        }
+
+        for(Motorcycle motorcycle : motorcyclesInShop)
+        {
+           ++counter;
+           total += motorcycle.getTotal();
+        }
+
+        for(Car car : repairedCars)
+        {
+            ++counter;
+            total += car.getTotal();
+        }
+
+        for(Motorcycle motorcycle : repairedMotorcycles)
+        {
+            ++counter;
+           total += motorcycle.getTotal();
+        }
+
+        System.out.println("Average repair cost: " + total/counter);
+    }
+
+    public static void percentageOfShop_RepairedVehicles()
+    {
+        int vehiclesInService = carsInShop.size() + motorcyclesInShop.size();
+        int repairedVehicles = vehiclesInService + repairedCars.size() + repairedMotorcycles.size();
+        int inShopPercentage = (vehiclesInService * 100) / repairedVehicles;
+
+        System.out.println("Percentage of vehicles inside the shop: " + inShopPercentage + "%");
+        System.out.println("Percentage of vehicles repaired by the shop: " + (100 - inShopPercentage) + "%");
+    }
+
+    public static void percentageOfCars_Motorcycles()
+    {
+        int numberOfCars = carsInShop.size() + repairedCars.size();
+        int numberOfVehicles = numberOfCars + motorcyclesInShop.size() + repairedMotorcycles.size();
+        int carsPercentage = (numberOfCars * 100) / numberOfVehicles;
+
+        System.out.println("Percentage of cars out of all vehicles: " + carsPercentage + "%");
+        System.out.println("Percentage of motorcycles out of all vehicles: " + (100 - carsPercentage) + "%");
+    }
 }
