@@ -4,10 +4,9 @@ I have a base class -> Vehicle from which I extend two other classes: Car and Mo
 for both cars and motorcycles. The vehicle class includes an Employee and a Client which are both based off the class Person, that they extend. The vehicle
 class also has an array of Issues which is a simple array of Issue type objects that only have 2 attributes: issue name and the issue price.
 
-First of all you have to login:
+First of all you have create an account ant then login to the app:
 
 ![Screenshot 2023-03-23 at 16 12 04](https://user-images.githubusercontent.com/54707251/227230587-b11bdb8e-bd90-4305-99c6-99e24f569283.png)
-
 
 In the shop you can do multiple actions:
 
@@ -20,7 +19,7 @@ Depending on which type of operations the user would like to do you have multipl
 
 I have used a priority queue for storing the employees. The criteria they are ordered by is each employee's salary. Whenever they are printed I use the poll method to retrieve the employees in the corect order. Example of printed employees in the right order:
 
-<img width="531" alt="Screenshot 2023-04-03 at 18 16 27" src="https://user-images.githubusercontent.com/54707251/229553280-6153791d-f579-40f1-9120-4952a2e009b5.png">
+<img width="507" alt="Screenshot 2023-04-04 at 10 12 59" src="https://user-images.githubusercontent.com/54707251/229715977-9c8a456e-ecaf-4031-b6cd-04bf0763898a.png">
 
 In the client management submenu the user has multiple options:
 
