@@ -73,7 +73,7 @@ public class Client extends Person
     public String toString()
     {
         return (
-                "\nFirst Name: " + this.getFirstName() +
+                "First Name: " + this.getFirstName() +
                 "\nLast Name: " + this.getName() +
                 "\nPhone Number: " + this.getPhoneNumber() +
                 "\nCurrent Balance: " + storeCredit + " euro" +
