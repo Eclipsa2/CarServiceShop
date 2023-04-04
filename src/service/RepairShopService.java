@@ -24,7 +24,6 @@ public class RepairShopService
         employees.add(new Employee("Nicolae", "Anemtoaicei", 123456789, 2500));
         employees.add(new Employee("Daldo", "Delevigne", 123456789, 3700));
         employees.add(new Employee("Pomelo", "Necsoiu", 123456789, 2900));
-        employees.add(new Employee("a", "a", 123456789, 9000000));
 
         Issue[] issues1 = new Issue[2];
         issues1[0] = new Issue("Engine Problems", 2000);
@@ -204,6 +203,12 @@ public class RepairShopService
             System.out.println("\n" + aux);
 
             auxEmployees.add(aux);
+        }
+
+        if(employees.size() != 0)
+        {
+            System.out.println("-------------------------------------------------");
+            System.out.println(employees.peek());
         }
 
         for(int i = 0; i <= auxEmployees.size(); ++i)

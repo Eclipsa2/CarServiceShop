@@ -2,13 +2,13 @@ package model;
 
 public abstract class Vehicle
 {
-    private String registrationNumber;
-    private String color;
-    private Boolean isRepaired;
-    private int fabricationYear;
-    private int horsePower;
-    private Client owner;
-    private Employee employee;
+    protected String registrationNumber;
+    protected String color;
+    protected Boolean isRepaired;
+    protected int fabricationYear;
+    protected int horsePower;
+    protected Client owner;
+    protected Employee employee;
 
     private Issue[] issues = new Issue[101];
 

@@ -1,9 +1,9 @@
 package model;
 
 public abstract class Person {
-    private String name;
-    private String firstName;
-    private int phoneNumber;
+    protected String name;
+    protected String firstName;
+    protected int phoneNumber;
 
     public Person() {
         this.name = "";
