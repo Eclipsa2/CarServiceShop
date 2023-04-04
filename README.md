@@ -4,14 +4,14 @@ I have a base class -> Vehicle from which I extend two other classes: Car and Mo
 for both cars and motorcycles. The vehicle class includes an Employee and a Client which are both based off the class Person, that they extend. The vehicle
 class also has an array of Issues which is a simple array of Issue type objects that only have 2 attributes: issue name and the issue price.
 
-First of all you have to login:
+First of all you have create an account ant then login to the app:
 
 ![Screenshot 2023-03-23 at 16 12 04](https://user-images.githubusercontent.com/54707251/227230587-b11bdb8e-bd90-4305-99c6-99e24f569283.png)
 
-
 In the shop you can do multiple actions:
 
-<img width="506" alt="Screenshot 2023-04-03 at 12 59 06" src="https://user-images.githubusercontent.com/54707251/229477342-74683c45-be1f-4e1e-b61d-a181709c10d0.png">
+<img width="504" alt="Screenshot 2023-04-03 at 19 57 56" src="https://user-images.githubusercontent.com/54707251/229577388-5f7e37aa-76a5-4a07-8aaf-2a0b8cfeebf6.png">
+
 
 Depending on which type of operations the user would like to do you have multiple operations. In the Hr management submenu you can see all employes, fire someone or hire one:
 
@@ -19,7 +19,7 @@ Depending on which type of operations the user would like to do you have multipl
 
 I have used a priority queue for storing the employees. The criteria they are ordered by is each employee's salary. Whenever they are printed I use the poll method to retrieve the employees in the corect order. Example of printed employees in the right order:
 
-<img width="531" alt="Screenshot 2023-04-03 at 18 16 27" src="https://user-images.githubusercontent.com/54707251/229553280-6153791d-f579-40f1-9120-4952a2e009b5.png">
+<img width="507" alt="Screenshot 2023-04-04 at 10 12 59" src="https://user-images.githubusercontent.com/54707251/229715977-9c8a456e-ecaf-4031-b6cd-04bf0763898a.png">
 
 In the client management submenu the user has multiple options:
 
@@ -34,3 +34,14 @@ Example of 2 clients that have not paid their repairs:
 The car repairs and motorcycle repairs are similar. The only difference is the type of vehicles and motorcycles having some more attributes to their name. The change car status option will repair the car, but not automatically pay the repairs for the car. Resofting a car will just tune the vehicle and add the desired number of horsepower to the vehicle.
 
 <img width="511" alt="Screenshot 2023-04-03 at 18 29 10" src="https://user-images.githubusercontent.com/54707251/229556570-39b5cc58-072a-45ba-8dd3-f2255051fa37.png">
+
+The statistics submenu offers two options. The first option asks the user for the name of a county and then prints all the vehicles that have the plate number from that one.
+
+<img width="498" alt="Screenshot 2023-04-03 at 20 00 19" src="https://user-images.githubusercontent.com/54707251/229577783-7c4daa11-8554-4aa2-824b-d654fd4a4920.png">
+
+The second option offers some general stats regarding the cars and repairs of the shop:
+Example:
+
+<img width="510" alt="Screenshot 2023-04-03 at 20 02 41" src="https://user-images.githubusercontent.com/54707251/229578270-485a2195-6010-40d4-8eb8-b975b4ff8ead.png">
+
+
