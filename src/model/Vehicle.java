@@ -38,11 +38,12 @@ public abstract class Vehicle
         }
     }
 
-    public void payRepairs()
+    public int payRepairs()
     {
         if (owner.getStoreCredit() < total)
         {
             System.out.println("The client does not have enough store credit to pay for the repair! ");
+            return 0;
         }
         else
         {
@@ -50,6 +51,7 @@ public abstract class Vehicle
             System.out.println("The repairs for this vehicle have been paid!");
             total = 0;
         }
+        return 1;
     }
 
     public void resoftVehicle(int addedHorsePower)

@@ -98,4 +98,14 @@ public class Client extends Person
     {
         return storeCredit;
     }
+
+    public void setLeftToBePaid(int leftToBePaid)
+    {
+        this.leftToBePaid = leftToBePaid;
+    }
+
+    public void setStoreCredit(int storeCredit)
+    {
+        this.storeCredit = storeCredit;
+    }
 }

@@ -1,3 +1,5 @@
+package model;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -10,7 +12,7 @@ public class DatabaseConnection {
 
     // private constructor to prevent instantiation from outside the class
     private DatabaseConnection() throws SQLException {
-        String url = "jdbc:mysql://localhost:3306/mydatabase";
+        String url = "jdbc:mysql://localhost:3306/serviceVeriku";
         String username = "root";
         String password = "";
         this.connection = DriverManager.getConnection(url, username, password);

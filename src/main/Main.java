@@ -3,9 +3,37 @@ package main;
 import model.*;
 import service.ShopMenu;
 
-import java.util.*;
+import java.io.IOException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 public class Main {
+    public static Connection dbConnection()
+    {
+        String url = "jdbc:mysql://localhost:3306/serviceVeriku";
+        String username = "root";
+        String password = "";
+        try
+        {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            Connection connection = DriverManager.getConnection(url, username, password);
+
+            return connection;
+        }
+        catch (ClassNotFoundException e)
+        {
+            System.out.println("Could not load JDBC driver: " + e.getMessage());
+            return null;
+        }
+        catch (SQLException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static int menu ()
     {
         System.out.println("\n-------------------------------------------------");
@@ -75,7 +103,7 @@ public class Main {
 
         return option;
     }
-    public static void main(String[] args)
+    public static void main(String[] args) throws SQLException, IOException
     {
         //region initialization of some cars
         Client client1 = new Client("Andrei", "Ilie",
@@ -92,8 +120,11 @@ public class Main {
                 "Volkswagen", "Golf VIII");
         //endregion
 
+        DatabaseConnection dbConnection = DatabaseConnection.getInstance();
+        Connection connection = dbConnection.getConnection();
+
         Scanner inputScanner = new Scanner(System.in);
-        String name, aux;
+        String name, aux, query;
 
         List <User> users = new ArrayList<User>();
 
@@ -115,15 +146,23 @@ public class Main {
                         aux = inputScanner.nextLine();
                         userAux = new User(name, aux);
 
-                        for(int i = 0; i < users.size(); ++i)
+                        query = "SELECT COUNT(*) FROM users WHERE username = ? AND password = ?";
+                        PreparedStatement statement = connection.prepareStatement(query);
+                        statement.setString(1, userAux.getUsername());
+                        statement.setString(2, userAux.getPassword());
+                        ResultSet numberOfUsers = statement.executeQuery();
+
+                        int isUser = 0;
+
+                        if(numberOfUsers.next())
+                            isUser = numberOfUsers.getInt(1);
+
+                        if(isUser > 0)
                         {
-                            if(users.get(i).equals(userAux))
-                            {
-                                option = ShopMenu.mainMenu();
-                                ok = 1;
-                                break;
-                            }
+                            option = ShopMenu.mainMenu();
+                            ok = 1;
                         }
+
                         if(ok == 0)
                         {
                             System.out.println("The login credentials are wrong!");
@@ -139,6 +178,12 @@ public class Main {
                     System.out.println("Please enter the password: ");
                     aux = inputScanner.nextLine();
                     User userAux = new User(name, aux);
+
+                    query = "INSERT INTO users (username, password) VALUES (?,?)";
+                    PreparedStatement statement = connection.prepareStatement(query);
+                    statement.setString(1, userAux.getUsername());
+                    statement.setString(2, userAux.getPassword());
+                    statement.execute();
 
                     users.add(userAux);
                     option = menuLogin();

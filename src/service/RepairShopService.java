@@ -1,11 +1,24 @@
 package service;
 
+import com.opencsv.CSVWriter;
 import model.*;
 
-import java.util.*;
-import java.util.regex.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class RepairShopService
+public abstract class RepairShopService
 {
     private static List<Client> clients = new ArrayList<Client>();
     private static PriorityQueue<Employee> employees = new PriorityQueue<Employee>();
@@ -14,87 +27,355 @@ public class RepairShopService
     private static List<Motorcycle> motorcyclesInShop = new ArrayList<Motorcycle>();
     private static List<Motorcycle> repairedMotorcycles = new ArrayList<Motorcycle>();
     private static Scanner inputScanner = new Scanner(System.in);
-
-    public static void dataInitialization()
+    private static DatabaseConnection dbConnection;
+    static
     {
-        clients.add(new Client("Ilie", "Andrei", 123456789));
-        clients.add(new Client("Ilie", "Virgil", 123456789));
-        clients.add(new Client("Anton", "Marius", 123456789));
+        try
+        {
+            dbConnection = DatabaseConnection.getInstance();
+        } catch (SQLException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+    private static Connection connection = dbConnection.getConnection();
 
-        employees.add(new Employee("Nicolae", "Anemtoaicei", 123456789, 2500));
-        employees.add(new Employee("Daldo", "Delevigne", 123456789, 3700));
-        employees.add(new Employee("Pomelo", "Necsoiu", 123456789, 2900));
+    public static void writeActionInFile(String action, String fileName) throws IOException
+    {
+        CSVWriter csvWriter = new CSVWriter(new FileWriter(fileName, true));
+        LocalDateTime currentDateTime = LocalDateTime.now();
 
-        Issue[] issues1 = new Issue[2];
-        issues1[0] = new Issue("Engine Problems", 2000);
-        issues1[1] = new Issue("Sofware Problems", 500);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDateTime = currentDateTime.format(formatter);
 
-        Issue[] issues2 = new Issue[3];
-        issues2[0] = new Issue("Body work", 1200);
-        issues2[1] = new Issue("Injector problems", 700);
-        issues2[2] = new Issue("Winter Tyres Change", 300);
+        switch (action)
+        {
+            case "AddedNewEmployee":
+            {
+                String[] row = {"A new employee has been added", formattedDateTime};
+                csvWriter.writeNext(row);
+                csvWriter.close();
+                break;
+            }
 
-        Car car1 = new Car("B27FLG", "grey", 2022,
-                130, clients.get(0), employees.peek(), issues1,
-                "Volkswagen", "Golf VIII");
+            case "SeeAllEmployees":
+            {
+                String[] row = {"All employees have been printed", formattedDateTime};
+                csvWriter.writeNext(row);
+                csvWriter.close();
+                break;
+            }
 
-        Car car2 = new Car("B127HWT", "white", 2011,
-                80, clients.get(1), employees.peek(), issues2,
-                "Ford", "Focus MK.2");
+            case "FiredEmployee":
+            {
+                String[] row = {"An employee has been fired", formattedDateTime};
+                csvWriter.writeNext(row);
+                csvWriter.close();
+                break;
+            }
 
-        Car car3 = new Car("B102BBU", "grey", 2020,
-                90, clients.get(2), employees.peek(), issues1,
-                "Hyundai", "I20");
+            case "RegisterNewClient":
+            {
+                String[] row = {"A new client has been registered", formattedDateTime};
+                csvWriter.writeNext(row);
+                csvWriter.close();
+                break;
+            }
 
-        Car car4 = new Car("IF23QWR", "yellow", 2023,
-                420, clients.get(0), employees.peek(), issues1,
-                "Mercedes-Benz", "AMG A45S");
+            case "SeeAllClients":
+            {
+                String[] row = {"All clients have been printed", formattedDateTime};
+                csvWriter.writeNext(row);
+                csvWriter.close();
+                break;
+            }
 
-        Car car5 = new Car("CT183BWR", "blue", 2017,
-                100, clients.get(1), employees.peek(), issues2,
-                "Hyundai", "Tucson");
+            case "AddStoreCreditToClient":
+            {
+                String[] row = {"Store credit has been added to a client", formattedDateTime};
+                csvWriter.writeNext(row);
+                csvWriter.close();
+                break;
+            }
 
-        Car car6 = new Car("B73HLO", "green", 2020,
-                220, clients.get(2), employees.peek(), issues1,
-                "BMW", "320i");
+            case "PayRepairs":
+            {
+                String[] row = {"Repairs for a vehicle have been paid", formattedDateTime};
+                csvWriter.writeNext(row);
+                csvWriter.close();
+                break;
+            }
 
-        Car car7 = new Car("CT20HEV", "blue", 2021,
-                650, clients.get(1), employees.peek(), issues2,
-                "Audi", "RS6");
+            case "AddANewCar":
+            {
+                String[] row = {"A new car has been added in the service", formattedDateTime};
+                csvWriter.writeNext(row);
+                csvWriter.close();
+                break;
+            }
 
-        carsInShop.add(car1);
-        carsInShop.add(car2);
-        carsInShop.add(car3);
-        carsInShop.add(car4);
+            case "SeeAllCars":
+            {
+                String[] row = {"All cars have been printed", formattedDateTime};
+                csvWriter.writeNext(row);
+                csvWriter.close();
+                break;
+            }
 
-        repairedCars.add(car5);
-        repairedCars.add(car6);
-        repairedCars.add(car7);
+            case "ChangeCarStatus":
+            {
+                String[] row = {"A car has been repaired", formattedDateTime};
+                csvWriter.writeNext(row);
+                csvWriter.close();
+                break;
+            }
 
-        Motorcycle motorcycle1 = new Motorcycle("B123ABC", "black", 2023,
-                230, clients.get(0), employees.peek(), issues1,
-                "Yamaha", "YZF R", 300, "6 Speed Double Clutch");
+            case "SeeAllRepairedCars":
+            {
+                String[] row = {"All repaired cars have been printed", formattedDateTime};
+                csvWriter.writeNext(row);
+                csvWriter.close();
+                break;
+            }
 
-        Motorcycle motorcycle2 = new Motorcycle("B23QPQ", "orange", 2019,
-                125, clients.get(1), employees.peek(), issues2,
-                "BMW", "Zonda", 276, "6 Speed Simple Clutch");
+            case "ResoftACar":
+            {
+                String[] row = {"A car has been resofted", formattedDateTime};
+                csvWriter.writeNext(row);
+                csvWriter.close();
+                break;
+            }
 
-        Motorcycle motorcycle3 = new Motorcycle("CT75AQP", "white", 2015,
-                120, clients.get(2), employees.peek(), issues2,
-                "Suzuki", "Max 123", 300, "6 Speed Double Clutch");
+            case "AddANewMotorcycle":
+            {
+                String[] row = {"A new motorcycle has been added in the service", formattedDateTime};
+                csvWriter.writeNext(row);
+                csvWriter.close();
+                break;
+            }
 
-        Motorcycle motorcycle4 = new Motorcycle("CT951AOL", "black", 2023,
-                170, clients.get(0), employees.peek(), issues1,
-                "Yamaha", "H123Q", 220, "6 Speed Double Clutch");
+            case "SeeAllMotorcycles":
+            {
+                String[] row = {"All motorcycles have been printed", formattedDateTime};
+                csvWriter.writeNext(row);
+                csvWriter.close();
+                break;
+            }
 
-        motorcyclesInShop.add(motorcycle1);
-        motorcyclesInShop.add(motorcycle2);
+            case "ChangeMotorcycleStatus":
+            {
+                String[] row = {"A motorcycle has been repaired", formattedDateTime};
+                csvWriter.writeNext(row);
+                csvWriter.close();
+                break;
+            }
 
-        repairedMotorcycles.add(motorcycle3);
-        repairedMotorcycles.add(motorcycle4);
+            case "SeeAllRepairedMotorcycles":
+            {
+                String[] row = {"All repaired motorcycles have been printed", formattedDateTime};
+                csvWriter.writeNext(row);
+                csvWriter.close();
+                break;
+            }
+
+            case "ResoftAMotorcycle":
+            {
+                String[] row = {"A motorcycle has been resofted", formattedDateTime};
+                csvWriter.writeNext(row);
+                csvWriter.close();
+                break;
+            }
+        }
+    }
+
+    public static ResultSet getAllDataFromTable(String tableName) throws SQLException
+    {
+        String query = "SELECT * FROM " + tableName;
+        PreparedStatement statement = connection.prepareStatement(query);
+        ResultSet rs = statement.executeQuery();
+        return rs;
+    }
+
+    public static <Issue> Issue[] arrayListToIssuesArray(ArrayList<Issue> arrayList)
+    {
+        Issue[] array = (Issue[]) new Object[arrayList.size()];
+
+        for(int i = 0; i < arrayList.size(); ++i)
+            array[i] = arrayList.get(i);
+
+        return array;
+    }
+    public static void dataInitialization() throws SQLException
+    {
+        ResultSet rs;
+        rs = getAllDataFromTable("clients");
+        Client auxClient = null;
+        while(rs.next())
+        {
+            auxClient = new Client(rs.getString("name"),
+                            rs.getString("firstName"),
+                            rs.getInt("phoneNumber"));
+            auxClient.setLeftToBePaid(rs.getInt("leftToBePaid"));
+            auxClient.setStoreCredit(rs.getInt("storeCredit"));
+            auxClient.setPaidRepairs(rs.getBoolean("paidRepairs"));
+
+            clients.add(auxClient);
+        }
+
+        rs = getAllDataFromTable("employees");
+        Employee auxEmployee = null;
+        while(rs.next())
+        {
+            auxEmployee = new Employee(rs.getString("name"),
+                    rs.getString("firstName"),
+                    rs.getInt("phoneNumber"),
+                    rs.getInt("salary"));
+
+            employees.add(auxEmployee);
+        }
+
+        rs = getAllDataFromTable("cars");
+        Car auxCar;
+        String query;
+        PreparedStatement statement;
+        while(rs.next())
+        {
+            //region Getting the owner details for the current car:
+            query = "SELECT * FROM clients WHERE ID = ?";
+            statement = connection.prepareStatement(query);
+            statement.setString(1, rs.getString("ownerID"));
+            ResultSet ownerDetails = statement.executeQuery();
+
+            if(ownerDetails.next())
+            {
+                auxClient = new Client(ownerDetails.getString("name"),
+                        ownerDetails.getString("firstName"),
+                        ownerDetails.getInt("phoneNumber"));
+                auxClient.setLeftToBePaid(ownerDetails.getInt("leftToBePaid"));
+                auxClient.setStoreCredit(ownerDetails.getInt("storeCredit"));
+                auxClient.setPaidRepairs(ownerDetails.getBoolean("paidRepairs"));
+            }
+            //endregion
+
+            //region Getting the employee that is working for the current car:
+            query = "SELECT * FROM employees WHERE ID = ?";
+            statement = connection.prepareStatement(query);
+            statement.setString(1, rs.getString("EmployeeID"));
+            ResultSet employeeDetails = statement.executeQuery();
+
+            if(employeeDetails.next())
+            {
+                auxEmployee = new Employee(employeeDetails.getString("name"),
+                        employeeDetails.getString("firstName"),
+                        employeeDetails.getInt("phoneNumber"),
+                        employeeDetails.getInt("salary"));
+            }
+            //endregion
+
+            //region Getting issues array for the current car:
+            query = "SELECT i.issueName, i.price FROM issues i INNER JOIN carIssues ci ON i.ID = ci.issueID INNER JOIN cars c ON c.ID = ci.carID WHERE c.ID = ?";
+            statement = connection.prepareStatement(query);
+            statement.setString(1, rs.getString("ID"));
+            ResultSet issues = statement.executeQuery();
+            ArrayList<Issue> auxIssues = new ArrayList<>();
+            while(issues.next())
+                auxIssues.add(new Issue(issues.getString("issueName"),
+                                        issues.getInt("price")));
+
+            Issue[] issuesArray = new Issue[auxIssues.size()];
+
+            for(int i = 0; i < issuesArray.length; ++i)
+                issuesArray[i] = auxIssues.get(i);
+            //endregion
+
+            auxCar = new Car(rs.getString("registrationNumber"),
+                    rs.getString("color"),
+                    rs.getInt("fabricationYear"),
+                    rs.getInt("horsePower"),
+                    auxClient,
+                    auxEmployee,
+                    issuesArray,
+                    rs.getString("manufacturer"),
+                    rs.getString("model"));
+
+            if(rs.getBoolean("isRepaired"))
+                repairedCars.add(auxCar);
+
+            else carsInShop.add(auxCar);
+        }
+
+        rs = getAllDataFromTable("motorcycles");
+        Motorcycle auxMotorcycle;
+        while(rs.next())
+        {
+            //region Getting the owner details for the current motorcycle:
+            query = "SELECT * FROM clients WHERE ID = ?";
+            statement = connection.prepareStatement(query);
+            statement.setString(1, rs.getString("ownerID"));
+            ResultSet ownerDetails = statement.executeQuery();
+
+            if(ownerDetails.next())
+            {
+                auxClient = new Client(ownerDetails.getString("name"),
+                        ownerDetails.getString("firstName"),
+                        ownerDetails.getInt("phoneNumber"));
+                auxClient.setLeftToBePaid(ownerDetails.getInt("leftToBePaid"));
+                auxClient.setStoreCredit(ownerDetails.getInt("storeCredit"));
+                auxClient.setPaidRepairs(ownerDetails.getBoolean("paidRepairs"));
+            }
+            //endregion
+
+            //region Getting the employee that is working for the current motorcycle:
+            query = "SELECT * FROM employees WHERE ID = ?";
+            statement = connection.prepareStatement(query);
+            statement.setString(1, rs.getString("EmployeeID"));
+            ResultSet employeeDetails = statement.executeQuery();
+
+            if(employeeDetails.next())
+            {
+                auxEmployee = new Employee(employeeDetails.getString("name"),
+                        employeeDetails.getString("firstName"),
+                        employeeDetails.getInt("phoneNumber"),
+                        employeeDetails.getInt("salary"));
+            }
+            //endregion
+
+            //region Getting issues array for the current motorcycle:
+            query = "SELECT i.issueName, i.price FROM issues i INNER JOIN motorcycleIssues mi ON i.ID = mi.issueID INNER JOIN motorcycles m ON m.ID = mi.MotorcycleID WHERE m.ID = ?";
+            statement = connection.prepareStatement(query);
+            statement.setString(1, rs.getString("ID"));
+            ResultSet issues = statement.executeQuery();
+            ArrayList<Issue> auxIssues = new ArrayList<>();
+            while(issues.next())
+                auxIssues.add(new Issue(issues.getString("issueName"),
+                        issues.getInt("price")));
+
+            Issue[] issuesArray = new Issue[auxIssues.size()];
+
+            for(int i = 0; i < issuesArray.length; ++i)
+                issuesArray[i] = auxIssues.get(i);
+            //endregion
+
+            auxMotorcycle = new Motorcycle(rs.getString("registrationNumber"),
+                    rs.getString("color"),
+                    rs.getInt("fabricationYear"),
+                    rs.getInt("horsePower"),
+                    auxClient,
+                    auxEmployee,
+                    issuesArray,
+                    rs.getString("manufacturer"),
+                    rs.getString("model"),
+                    rs.getInt("totalMass"),
+                    rs.getString("transmissionType"));
+
+            if(rs.getBoolean("isRepaired"))
+                repairedMotorcycles.add(auxMotorcycle);
+
+            else motorcyclesInShop.add(auxMotorcycle);
+        }
 
     }
-    public static void registerNewClient()
+    public static void registerNewClient() throws SQLException, IOException
     {
         String firstName, name, aux;
 
@@ -107,11 +388,20 @@ public class RepairShopService
         Client auxClient = new Client(name, firstName, Integer.parseInt(aux));
         clients.add(auxClient);
 
+        String query = "INSERT INTO clients (name, firstName, phoneNumber) VALUES (?,?,?)";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, auxClient.getName());
+        statement.setString(2, auxClient.getFirstName());
+        statement.setString(3, String.valueOf(auxClient.getPhoneNumber()));
+        statement.execute();
+
         System.out.println("The Client has been registered: ");
         System.out.println(auxClient);
+
+        writeActionInFile("RegisterNewClient", "ClientAudit.csv");
     }
 
-    public static void printAllClients()
+    public static void printAllClients() throws IOException
     {
         System.out.println("\nThese are all the clients of this Shop: ");
 
@@ -121,9 +411,12 @@ public class RepairShopService
             System.out.println("-------------------------------------------------");
             System.out.println(clients.get(i));
         }
+
+        writeActionInFile("SeeAllClients", "ClientAudit.csv");
     }
 
-    public static void addStoreCredit() {
+    public static void addStoreCredit() throws SQLException, IOException
+    {
         Client clientAux = new Client();
         int ok = 0;
         while (ok != 1) {
@@ -132,14 +425,25 @@ public class RepairShopService
             System.out.println("Please enter the first name of the client: ");
             String clientFirstName = inputScanner.nextLine();
             clientAux = new Client(clientName, clientFirstName, 123);
-            for (int i = 0; i < clients.size(); ++i) {
-                if (clients.get(i).equals(clientAux)) {
+            for (int i = 0; i < clients.size(); ++i)
+            {
+                if (clients.get(i).equals(clientAux))
+                {
                     ok = 1;
 
                     System.out.println("\nHow much store credit do you want to add to " + clients.get(i).getName() + " "
                             + clients.get(i).getFirstName() + "'s balance?");
                     int toBeAddedStoreCredit = Integer.parseInt(inputScanner.nextLine());
                     clients.get(i).addStoreCredit(toBeAddedStoreCredit);
+
+                    int newCredit = clients.get(i).getStoreCredit();
+
+                    String query = "UPDATE clients SET storeCredit = ? WHERE name = ? AND firstName = ?";
+                    PreparedStatement statement = connection.prepareStatement(query);
+                    statement.setString(1, String.valueOf(newCredit));
+                    statement.setString(2, clients.get(i).getName());
+                    statement.setString(3, clients.get(i).getFirstName());
+                    statement.execute();
 
                     break;
                 }
@@ -148,15 +452,19 @@ public class RepairShopService
                 System.out.println("Please enter a valid client!");
             }
         }
+
+        writeActionInFile("AddStoreCreditToClient", "ClientAudit.csv");
     }
 
-    public static void repairVehicle()
+    public static void payRepairs() throws SQLException, IOException
     {
         String registrationNumber;
-        System.out.println("\nPlease enter the registration number of the car: ");
+        System.out.println("\nPlease enter the registration number of the vehicle: ");
         registrationNumber = inputScanner.nextLine();
         Car auxCar = new Car();
         auxCar.setRegistrationNumber(registrationNumber);
+        Motorcycle auxMotorcycle = new Motorcycle();
+        auxMotorcycle.setRegistrationNumber(registrationNumber);
 
         int ok = 0;
         for(int i = 0; i < carsInShop.size(); ++i)
@@ -164,13 +472,49 @@ public class RepairShopService
             if(carsInShop.get(i).equals(auxCar))
             {
                 ok = 1;
-                carsInShop.get(i).payRepairs();
+                int repaired = carsInShop.get(i).payRepairs();
+
+                if(repaired == 1)
+                {
+                    //region update paidRepairs atribute:
+                    String query = "UPDATE cars SET paidRepairs = ? WHERE registrationNumber = ?";
+                    PreparedStatement statement = connection.prepareStatement(query);
+                    statement.setString(1, String.valueOf(repaired));
+                    statement.setString(2, auxCar.getRegistrationNumber());
+                    statement.execute();
+                    //endregion
+                }
+
                 break;
             }
         }
-        if(ok == 0) System.out.println("The car with that registration number was not found!");
+
+        for(int i = 0; i < motorcyclesInShop.size(); ++i)
+        {
+            if(motorcyclesInShop.get(i).equals(auxCar))
+            {
+                ok = 1;
+                int repaired = motorcyclesInShop.get(i).payRepairs();
+
+                if(repaired == 1)
+                {
+                    //region update paidRepairs atribute:
+                    String query = "UPDATE motorcycles SET paidRepairs = ? WHERE registrationNumber = ?";
+                    PreparedStatement statement = connection.prepareStatement(query);
+                    statement.setString(1, String.valueOf(repaired));
+                    statement.setString(2, auxMotorcycle.getRegistrationNumber());
+                    statement.execute();
+                    //endregion
+                }
+
+                break;
+            }
+        }
+
+        if(ok == 1) writeActionInFile("PayRepairs", "ClientAudit.csv");
+        else if(ok == 0) System.out.println("The vehicle with that registration number was not found!");
     }
-    public static void hireEmployee()
+    public static void hireEmployee() throws SQLException, IOException
     {
         String firstName, name, aux;
 
@@ -185,11 +529,21 @@ public class RepairShopService
         Employee auxEmployee = new Employee(name, firstName, Integer.parseInt(aux), Integer.parseInt(salary));
         employees.add(auxEmployee);
 
+        String query = "INSERT INTO employees (name, firstName, phoneNumber, salary) VALUES (?,?,?,?)";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, auxEmployee.getName());
+        statement.setString(2, auxEmployee.getFirstName());
+        statement.setString(3, String.valueOf(auxEmployee.getPhoneNumber()));
+        statement.setString(4, String.valueOf(auxEmployee.getSalary()));
+        statement.execute();
+
         System.out.println("The Employee has been hired: ");
         System.out.println(auxEmployee);
+
+        writeActionInFile("AddedNewEmployee", "HrAudit.csv");
     }
 
-    public static void printAllEmployees()
+    public static void printAllEmployees() throws SQLException, IOException
     {
         System.out.println("\nThese are all the employees of this Shop: ");
         PriorityQueue<Employee> auxEmployees = new PriorityQueue<Employee>();
@@ -213,9 +567,11 @@ public class RepairShopService
 
         for(int i = 0; i <= auxEmployees.size(); ++i)
             employees.add(auxEmployees.poll());
+
+        writeActionInFile("SeeAllEmployees", "HrAudit.csv");
     }
 
-    public static void fireEmployee()
+    public static void fireEmployee() throws SQLException, IOException
     {
         System.out.println("\nPlease enter the name of the employee which you want to fire:");
         String employeeName = inputScanner.nextLine();
@@ -225,14 +581,22 @@ public class RepairShopService
 
         if(employees.remove(auxEmployee))
         {
+            String query = "DELETE FROM employees WHERE firstName = ? AND name = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, auxEmployee.getFirstName());
+            statement.setString(2, auxEmployee.getName());
+            statement.execute();
+
             System.out.println("\nThe employee has been fired!");
+
+            writeActionInFile("FiredEmployee", "HrAudit.csv");
         }
 
         else System.out.println("\nThe employee was not found!");
 
     }
 
-    public static void addNewCar()
+    public static void addNewCar() throws SQLException, IOException
     {
         String registrationNumber, color, fabricationYear,
                 horsePower, clientName, clientFirstName,
@@ -240,6 +604,7 @@ public class RepairShopService
                 issuePrice, manufacturer, model;
         Client clientAux = new Client();
         Employee employeeAux = new Employee();
+        int EmployeeID = 0, ClientID = 0;
 
         System.out.println("\nPlease enter the registration number of the car: ");
         registrationNumber = inputScanner.nextLine();
@@ -264,6 +629,19 @@ public class RepairShopService
                 {
                     ok = 1;
                     clientAux = clients.get(i);
+
+                    //region get Client ID from DB:
+                    String query = "SELECT ID FROM clients WHERE name = ? AND firstName = ?";
+                    PreparedStatement statement = connection.prepareStatement(query);
+                    statement.setString(1, clientAux.getName());
+                    statement.setString(2, clientAux.getFirstName());
+                    ResultSet clientDetails = statement.executeQuery();
+
+                    if(clientDetails.next())
+                        ClientID = clientDetails.getInt("ID");
+
+                    //endregion
+
                     break;
                 }
             }
@@ -287,6 +665,19 @@ public class RepairShopService
                 {
                     ok = 1;
                     employeeAux = e;
+
+                    //region get Employee ID from DB:
+                    String query = "SELECT ID FROM employees WHERE name = ? AND firstName = ?";
+                    PreparedStatement statement = connection.prepareStatement(query);
+                    statement.setString(1, employeeAux.getName());
+                    statement.setString(2, employeeAux.getFirstName());
+                    ResultSet employeeDetails = statement.executeQuery();
+
+                    if(employeeDetails.next())
+                        EmployeeID = employeeDetails.getInt("ID");
+
+                    //endregion
+
                     break;
                 }
             }
@@ -306,6 +697,13 @@ public class RepairShopService
             System.out.println("Please enter the price of the issue: ");
             issuePrice = inputScanner.nextLine();
             issues[i] = new Issue(issueName, Integer.parseInt(issuePrice));
+            //region add Issue to DB:
+            String query = "INSERT IGNORE INTO issues (issueName, price) VALUES (?,?)";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, issues[i].getIssueName());
+            statement.setString(2, String.valueOf(issues[i].getPrice()));
+            statement.execute();
+            //endregion
         }
 
         System.out.println("Please enter the manufacturer of the car: ");
@@ -317,10 +715,61 @@ public class RepairShopService
                 Integer.parseInt(horsePower), clientAux, employeeAux, issues,
                 manufacturer, model);
         carsInShop.add(carAux);
+
+        //region add Car to DB:
+        String query = "INSERT INTO cars (registrationNumber, color, isRepaired, fabricationYear, horsePower" +
+                ", ownerID, EmployeeID, manufacturer, model, paidRepairs) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, carAux.getRegistrationNumber());
+        statement.setString(2, carAux.getColor());
+        statement.setString(3, String.valueOf(0));
+        statement.setString(4, String.valueOf(carAux.getFabricationYear()));
+        statement.setString(5, String.valueOf(carAux.getHorsePower()));
+        statement.setString(6, String.valueOf(ClientID));
+        statement.setString(7, String.valueOf(EmployeeID));
+        statement.setString(8, carAux.getManufacturer());
+        statement.setString(9, carAux.getModel());
+        statement.setString(10, String.valueOf(0));
+        statement.execute();
+        //endregion
+
+        //region add the associative table rows in carIssues for the car:
+        query = "SELECT ID FROM cars WHERE registrationNumber = ?";
+        statement = connection.prepareStatement(query);
+        statement.setString(1, carAux.getRegistrationNumber());
+        ResultSet carIDResultSet = statement.executeQuery();
+        int carID = 0;
+
+        if(carIDResultSet.next())
+            carID = carIDResultSet.getInt("ID");
+
+        int issueID = 0;
+
+        for(int i = 0; i < issues.length; ++i)
+        {
+            query = "SELECT ID FROM issues WHERE issueName = ? and price = ?";
+            statement = connection.prepareStatement(query);
+            statement.setString(1, issues[i].getIssueName());
+            statement.setString(2, String.valueOf(issues[i].getPrice()));
+            ResultSet issueIDResultSet = statement.executeQuery();
+
+            if(issueIDResultSet.next())
+                issueID = issueIDResultSet.getInt("ID");
+
+            query = "INSERT INTO carIssues (IssueID, CarID) VALUES (?,?)";
+            statement = connection.prepareStatement(query);
+            statement.setString(1, String.valueOf(issueID));
+            statement.setString(2, String.valueOf(carID));
+            statement.execute();
+        }
+
+        //endregion
         System.out.println(carAux);
+
+        writeActionInFile("AddANewCar", "VehiclesAudit.csv");
     }
 
-    public static void printAllCarsInShop()
+    public static void printAllCarsInShop() throws IOException
     {
         System.out.println("\nThese are all the cars currently in this Shop: ");
 
@@ -329,9 +778,11 @@ public class RepairShopService
             System.out.println("-------------------------------------------------");
             System.out.println(carsInShop.get(i));
         }
+
+        writeActionInFile("SeeAllCars", "VehiclesAudit.csv");
     }
 
-    public static void changeCarStatus()
+    public static void changeCarStatus() throws SQLException, IOException
     {
         String registrationNumber;
         System.out.println("\nPlease enter the registration number of the car: ");
@@ -349,14 +800,28 @@ public class RepairShopService
                 auxCar = carsInShop.get(i);
                 carsInShop.remove(i);
                 repairedCars.add(auxCar);
+
+                //region change isRepaired from DB:
+                String query = "UPDATE cars SET isRepaired = ? WHERE registrationNumber = ?";
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setString(1, String.valueOf(1));
+                statement.setString(2, auxCar.getRegistrationNumber());
+                statement.execute();
+                //endregion
+
                 break;
             }
         }
         if(ok == 0) System.out.println("The car with that registration number was not found!");
-        else System.out.println("The car has been repaired!");
+        else
+        {
+            System.out.println("The car has been repaired!");
+
+            writeActionInFile("ChangeCarStatus", "VehiclesAudit.csv");
+        }
     }
 
-    public static void printAllRepairedCars()
+    public static void printAllRepairedCars() throws IOException
     {
         System.out.println("\nThese are all the repaired cars by Shop: ");
         for(int i = 0; i < repairedCars.size(); ++i)
@@ -364,9 +829,11 @@ public class RepairShopService
             System.out.println("-------------------------------------------------");
             System.out.println(repairedCars.get(i));
         }
+
+        writeActionInFile("SeeAllRepairedCars", "VehiclesAudit.csv");
     }
 
-    public static void addHorsePowerToCar()
+    public static void addHorsePowerToCar() throws SQLException, IOException
     {
         String registrationNumber;
         System.out.println("\nPlease enter the registration number of the car: ");
@@ -384,14 +851,26 @@ public class RepairShopService
                 int addedHorsePower = Integer.parseInt(inputScanner.nextLine());
                 carsInShop.get(i).resoftVehicle(addedHorsePower);
                 System.out.println(carsInShop.get(i));
+
+                String query = "UPDATE cars SET horsePower = ? WHERE registrationNumber = ?";
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setString(1, String.valueOf(carsInShop.get(i).getHorsePower()));
+                statement.setString(2, auxCar.getRegistrationNumber());
+                statement.execute();
+
                 break;
             }
         }
         if(ok == 0) System.out.println("The car with that registration number was not found!");
-        else System.out.println("\nThe car has been resofted!");
+        else
+        {
+            System.out.println("\nThe car has been resofted!");
+
+            writeActionInFile("ResoftACar", "VehiclesAudit.csv");
+        }
     }
 
-    public static void addNewMotorcycle()
+    public static void addNewMotorcycle() throws SQLException, IOException
     {
         String registrationNumber, color, fabricationYear,
                 horsePower, clientName, clientFirstName,
@@ -399,6 +878,7 @@ public class RepairShopService
                 issuePrice, manufacturer, model, totalMass, transmissionType;
         Client clientAux = new Client();
         Employee employeeAux = new Employee();
+        int ClientID = 0, EmployeeID = 0;
 
         System.out.println("\nPlease enter the registration number of the motorcycle: ");
         registrationNumber = inputScanner.nextLine();
@@ -423,6 +903,19 @@ public class RepairShopService
                 {
                     ok = 1;
                     clientAux = clients.get(i);
+
+                    //region get Client ID from DB:
+                    String query = "SELECT ID FROM clients WHERE name = ? AND firstName = ?";
+                    PreparedStatement statement = connection.prepareStatement(query);
+                    statement.setString(1, clientAux.getName());
+                    statement.setString(2, clientAux.getFirstName());
+                    ResultSet clientDetails = statement.executeQuery();
+
+                    if(clientDetails.next())
+                        ClientID = clientDetails.getInt("ID");
+
+                    //endregion
+
                     break;
                 }
             }
@@ -446,6 +939,19 @@ public class RepairShopService
                 {
                     ok = 1;
                     employeeAux = e;
+
+                    //region get Employee ID from DB:
+                    String query = "SELECT ID FROM employees WHERE name = ? AND firstName = ?";
+                    PreparedStatement statement = connection.prepareStatement(query);
+                    statement.setString(1, employeeAux.getName());
+                    statement.setString(2, employeeAux.getFirstName());
+                    ResultSet employeeDetails = statement.executeQuery();
+
+                    if(employeeDetails.next())
+                        EmployeeID = employeeDetails.getInt("ID");
+
+                    //endregion
+
                     break;
                 }
             }
@@ -465,6 +971,13 @@ public class RepairShopService
             System.out.println("Please enter the price of the issue: ");
             issuePrice = inputScanner.nextLine();
             issues[i] = new Issue(issueName, Integer.parseInt(issuePrice));
+            //region add Issue to DB:
+            String query = "INSERT IGNORE INTO issues (issueName, price) VALUES (?,?)";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, issues[i].getIssueName());
+            statement.setString(2, String.valueOf(issues[i].getPrice()));
+            statement.execute();
+            //endregion
         }
 
         System.out.println("Please enter the manufacturer of the motorcycle: ");
@@ -480,10 +993,64 @@ public class RepairShopService
                 Integer.parseInt(horsePower), clientAux, employeeAux, issues,
                 manufacturer, model, Integer.parseInt(totalMass), transmissionType);
         motorcyclesInShop.add(motorcycleAux);
+
+        //region add motorcycle to DB:
+        String query = "INSERT INTO motorcycles(registrationNumber, color, fabricationYear, horsePower" +
+                ", ownerID, EmployeeID, manufacturer, model, totalMass, transmissionType, paidRepairs, isRepaired) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, motorcycleAux.getRegistrationNumber());
+        statement.setString(2, motorcycleAux.getColor());
+        statement.setString(3, String.valueOf(motorcycleAux.getFabricationYear()));
+        statement.setString(4, String.valueOf(motorcycleAux.getHorsePower()));
+        statement.setString(5, String.valueOf(ClientID));
+        statement.setString(6, String.valueOf(EmployeeID));
+        statement.setString(7, motorcycleAux.getManufacturer());
+        statement.setString(8, motorcycleAux.getModel());
+        statement.setString(9, String.valueOf(motorcycleAux.getTotalMass()));
+        statement.setString(10, motorcycleAux.getTransmissionType());
+        statement.setString(11, String.valueOf(0));
+        statement.setString(12, String.valueOf(0));
+        statement.execute();
+        //endregion
+
+        //region add the associative table rows in motorcycleIssues for the motorcycle:
+        query = "SELECT ID FROM motorcycles WHERE registrationNumber = ?";
+        statement = connection.prepareStatement(query);
+        statement.setString(1, motorcycleAux.getRegistrationNumber());
+        ResultSet motorcycleIDResultSet = statement.executeQuery();
+        int motorcycleID = 0;
+
+        if(motorcycleIDResultSet.next())
+            motorcycleID = motorcycleIDResultSet.getInt("ID");
+
+        int issueID = 0;
+
+        for(int i = 0; i < issues.length; ++i)
+        {
+            query = "SELECT ID FROM issues WHERE issueName = ? and price = ?";
+            statement = connection.prepareStatement(query);
+            statement.setString(1, issues[i].getIssueName());
+            statement.setString(2, String.valueOf(issues[i].getPrice()));
+            ResultSet issueIDResultSet = statement.executeQuery();
+
+            if(issueIDResultSet.next())
+                issueID = issueIDResultSet.getInt("ID");
+
+            query = "INSERT INTO motorcycleIssues (IssueID, MotorcycleID) VALUES (?,?)";
+            statement = connection.prepareStatement(query);
+            statement.setString(1, String.valueOf(issueID));
+            statement.setString(2, String.valueOf(motorcycleID));
+            statement.execute();
+        }
+
+        //endregion
+
         System.out.println(motorcycleAux);
+
+        writeActionInFile("AddANewMotorcycle", "VehiclesAudit.csv");
     }
 
-    public static void printAllMotorcyclesInShop()
+    public static void printAllMotorcyclesInShop() throws IOException
     {
         System.out.println("\nThese are all motorcycles in this Shop: ");
 
@@ -492,9 +1059,11 @@ public class RepairShopService
             System.out.println("-------------------------------------------------");
             System.out.println(motorcyclesInShop.get(i));
         }
+
+        writeActionInFile("SeeAllMotorcycles", "VehiclesAudit.csv");
     }
 
-    public static void changeMotorcycleStatus()
+    public static void changeMotorcycleStatus() throws SQLException, IOException
     {
         String registrationNumber;
         System.out.println("\nPlease enter the registration number of the motorcycle: ");
@@ -512,14 +1081,28 @@ public class RepairShopService
                 auxMotorcycle = motorcyclesInShop.get(i);
                 motorcyclesInShop.remove(i);
                 repairedMotorcycles.add(auxMotorcycle);
+
+                //region change isRepaired from DB:
+                String query = "UPDATE motorcycles SET isRepaired = ? WHERE registrationNumber = ?";
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setString(1, String.valueOf(1));
+                statement.setString(2, auxMotorcycle.getRegistrationNumber());
+                statement.execute();
+                //endregion
+
                 break;
             }
         }
         if(ok == 0) System.out.println("The motorcycle with that registration number was not found!");
-        else System.out.println("The motorcycle has been repaired!");
+        else
+        {
+            System.out.println("The motorcycle has been repaired!");
+
+            writeActionInFile("ChangeMotorcycleStatus", "VehiclesAudit.csv");
+        }
     }
 
-    public static void printAllRepairedMotorcycles()
+    public static void printAllRepairedMotorcycles() throws IOException
     {
         System.out.println("\nThese are all motorcycles repaired by the Shop: ");
 
@@ -528,9 +1111,11 @@ public class RepairShopService
             System.out.println("-------------------------------------------------");
             System.out.println(repairedMotorcycles.get(i));
         }
+
+        writeActionInFile("SeeAllRepairedMotorcycles", "VehiclesAudit.csv");
     }
 
-    public static void addHorsePowerToMotorcycle()
+    public static void addHorsePowerToMotorcycle() throws SQLException, IOException
     {
         String registrationNumber;
         System.out.println("\nPlease enter the registration number of the motorcycle: ");
@@ -548,11 +1133,23 @@ public class RepairShopService
                 int addedHorsePower = Integer.parseInt(inputScanner.nextLine());
                 motorcyclesInShop.get(i).resoftVehicle(addedHorsePower);
                 System.out.println(motorcyclesInShop.get(i));
+
+                String query = "UPDATE motorcycles SET horsePower = ? WHERE registrationNumber = ?";
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setString(1, String.valueOf(motorcyclesInShop.get(i).getHorsePower()));
+                statement.setString(2, auxMotorcycle.getRegistrationNumber());
+                statement.execute();
+
                 break;
             }
         }
         if(ok == 0) System.out.println("The motorcycle with that registration number was not found!");
-        else System.out.println("\nThe motorcycle has been resofted!");
+        else
+        {
+            System.out.println("\nThe motorcycle has been resofted!");
+
+            writeActionInFile("ResoftAMotorcycle", "VehiclesAudit.csv");
+        }
     }
 
     public static void searchVehiclesFromCounty()

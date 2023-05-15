@@ -2,6 +2,8 @@ package service;
 
 import main.Main;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class ShopMenu {
@@ -89,7 +91,7 @@ public class ShopMenu {
 
         return readOption(5);
     }
-    public static int mainMenu()
+    public static int mainMenu() throws SQLException, IOException
     {
         int option = Main.menu();
         RepairShopService.dataInitialization();
@@ -154,7 +156,7 @@ public class ShopMenu {
                             }
                             case 4:
                             {
-                                RepairShopService.repairVehicle();
+                                RepairShopService.payRepairs();
                                 optionSubmenu = clientMenu();
                                 break;
                             }
