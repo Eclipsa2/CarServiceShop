@@ -2,6 +2,10 @@ package service;
 
 import com.opencsv.CSVWriter;
 import model.*;
+import repository.CarsRepository;
+import repository.ClientRepository;
+import repository.EmployeesRepository;
+import repository.MotorcyclesRepository;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -207,173 +211,13 @@ public abstract class RepairShopService
     }
     public static void dataInitialization() throws SQLException
     {
-        ResultSet rs;
-        rs = getAllDataFromTable("clients");
-        Client auxClient = null;
-        while(rs.next())
-        {
-            auxClient = new Client(rs.getString("name"),
-                            rs.getString("firstName"),
-                            rs.getInt("phoneNumber"));
-            auxClient.setLeftToBePaid(rs.getInt("leftToBePaid"));
-            auxClient.setStoreCredit(rs.getInt("storeCredit"));
-            auxClient.setPaidRepairs(rs.getBoolean("paidRepairs"));
+        clients = ClientRepository.getAllClientsFromDB();
 
-            clients.add(auxClient);
-        }
+        employees = EmployeesRepository.getAllEmployeesFromDB();
 
-        rs = getAllDataFromTable("employees");
-        Employee auxEmployee = null;
-        while(rs.next())
-        {
-            auxEmployee = new Employee(rs.getString("name"),
-                    rs.getString("firstName"),
-                    rs.getInt("phoneNumber"),
-                    rs.getInt("salary"));
+        carsInShop = CarsRepository.getAllCarsFromDB(repairedCars);
 
-            employees.add(auxEmployee);
-        }
-
-        rs = getAllDataFromTable("cars");
-        Car auxCar;
-        String query;
-        PreparedStatement statement;
-        while(rs.next())
-        {
-            //region Getting the owner details for the current car:
-            query = "SELECT * FROM clients WHERE ID = ?";
-            statement = connection.prepareStatement(query);
-            statement.setString(1, rs.getString("ownerID"));
-            ResultSet ownerDetails = statement.executeQuery();
-
-            if(ownerDetails.next())
-            {
-                auxClient = new Client(ownerDetails.getString("name"),
-                        ownerDetails.getString("firstName"),
-                        ownerDetails.getInt("phoneNumber"));
-                auxClient.setLeftToBePaid(ownerDetails.getInt("leftToBePaid"));
-                auxClient.setStoreCredit(ownerDetails.getInt("storeCredit"));
-                auxClient.setPaidRepairs(ownerDetails.getBoolean("paidRepairs"));
-            }
-            //endregion
-
-            //region Getting the employee that is working for the current car:
-            query = "SELECT * FROM employees WHERE ID = ?";
-            statement = connection.prepareStatement(query);
-            statement.setString(1, rs.getString("EmployeeID"));
-            ResultSet employeeDetails = statement.executeQuery();
-
-            if(employeeDetails.next())
-            {
-                auxEmployee = new Employee(employeeDetails.getString("name"),
-                        employeeDetails.getString("firstName"),
-                        employeeDetails.getInt("phoneNumber"),
-                        employeeDetails.getInt("salary"));
-            }
-            //endregion
-
-            //region Getting issues array for the current car:
-            query = "SELECT i.issueName, i.price FROM issues i INNER JOIN carIssues ci ON i.ID = ci.issueID INNER JOIN cars c ON c.ID = ci.carID WHERE c.ID = ?";
-            statement = connection.prepareStatement(query);
-            statement.setString(1, rs.getString("ID"));
-            ResultSet issues = statement.executeQuery();
-            ArrayList<Issue> auxIssues = new ArrayList<>();
-            while(issues.next())
-                auxIssues.add(new Issue(issues.getString("issueName"),
-                                        issues.getInt("price")));
-
-            Issue[] issuesArray = new Issue[auxIssues.size()];
-
-            for(int i = 0; i < issuesArray.length; ++i)
-                issuesArray[i] = auxIssues.get(i);
-            //endregion
-
-            auxCar = new Car(rs.getString("registrationNumber"),
-                    rs.getString("color"),
-                    rs.getInt("fabricationYear"),
-                    rs.getInt("horsePower"),
-                    auxClient,
-                    auxEmployee,
-                    issuesArray,
-                    rs.getString("manufacturer"),
-                    rs.getString("model"));
-
-            if(rs.getBoolean("isRepaired"))
-                repairedCars.add(auxCar);
-
-            else carsInShop.add(auxCar);
-        }
-
-        rs = getAllDataFromTable("motorcycles");
-        Motorcycle auxMotorcycle;
-        while(rs.next())
-        {
-            //region Getting the owner details for the current motorcycle:
-            query = "SELECT * FROM clients WHERE ID = ?";
-            statement = connection.prepareStatement(query);
-            statement.setString(1, rs.getString("ownerID"));
-            ResultSet ownerDetails = statement.executeQuery();
-
-            if(ownerDetails.next())
-            {
-                auxClient = new Client(ownerDetails.getString("name"),
-                        ownerDetails.getString("firstName"),
-                        ownerDetails.getInt("phoneNumber"));
-                auxClient.setLeftToBePaid(ownerDetails.getInt("leftToBePaid"));
-                auxClient.setStoreCredit(ownerDetails.getInt("storeCredit"));
-                auxClient.setPaidRepairs(ownerDetails.getBoolean("paidRepairs"));
-            }
-            //endregion
-
-            //region Getting the employee that is working for the current motorcycle:
-            query = "SELECT * FROM employees WHERE ID = ?";
-            statement = connection.prepareStatement(query);
-            statement.setString(1, rs.getString("EmployeeID"));
-            ResultSet employeeDetails = statement.executeQuery();
-
-            if(employeeDetails.next())
-            {
-                auxEmployee = new Employee(employeeDetails.getString("name"),
-                        employeeDetails.getString("firstName"),
-                        employeeDetails.getInt("phoneNumber"),
-                        employeeDetails.getInt("salary"));
-            }
-            //endregion
-
-            //region Getting issues array for the current motorcycle:
-            query = "SELECT i.issueName, i.price FROM issues i INNER JOIN motorcycleIssues mi ON i.ID = mi.issueID INNER JOIN motorcycles m ON m.ID = mi.MotorcycleID WHERE m.ID = ?";
-            statement = connection.prepareStatement(query);
-            statement.setString(1, rs.getString("ID"));
-            ResultSet issues = statement.executeQuery();
-            ArrayList<Issue> auxIssues = new ArrayList<>();
-            while(issues.next())
-                auxIssues.add(new Issue(issues.getString("issueName"),
-                        issues.getInt("price")));
-
-            Issue[] issuesArray = new Issue[auxIssues.size()];
-
-            for(int i = 0; i < issuesArray.length; ++i)
-                issuesArray[i] = auxIssues.get(i);
-            //endregion
-
-            auxMotorcycle = new Motorcycle(rs.getString("registrationNumber"),
-                    rs.getString("color"),
-                    rs.getInt("fabricationYear"),
-                    rs.getInt("horsePower"),
-                    auxClient,
-                    auxEmployee,
-                    issuesArray,
-                    rs.getString("manufacturer"),
-                    rs.getString("model"),
-                    rs.getInt("totalMass"),
-                    rs.getString("transmissionType"));
-
-            if(rs.getBoolean("isRepaired"))
-                repairedMotorcycles.add(auxMotorcycle);
-
-            else motorcyclesInShop.add(auxMotorcycle);
-        }
-
+        motorcyclesInShop = MotorcyclesRepository.getAllMotorcyclesFromDB(repairedMotorcycles);
     }
     public static void registerNewClient() throws SQLException, IOException
     {
@@ -388,12 +232,7 @@ public abstract class RepairShopService
         Client auxClient = new Client(name, firstName, Integer.parseInt(aux));
         clients.add(auxClient);
 
-        String query = "INSERT INTO clients (name, firstName, phoneNumber) VALUES (?,?,?)";
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, auxClient.getName());
-        statement.setString(2, auxClient.getFirstName());
-        statement.setString(3, String.valueOf(auxClient.getPhoneNumber()));
-        statement.execute();
+        ClientRepository.registerNewClient(auxClient);
 
         System.out.println("The Client has been registered: ");
         System.out.println(auxClient);
@@ -436,14 +275,7 @@ public abstract class RepairShopService
                     int toBeAddedStoreCredit = Integer.parseInt(inputScanner.nextLine());
                     clients.get(i).addStoreCredit(toBeAddedStoreCredit);
 
-                    int newCredit = clients.get(i).getStoreCredit();
-
-                    String query = "UPDATE clients SET storeCredit = ? WHERE name = ? AND firstName = ?";
-                    PreparedStatement statement = connection.prepareStatement(query);
-                    statement.setString(1, String.valueOf(newCredit));
-                    statement.setString(2, clients.get(i).getName());
-                    statement.setString(3, clients.get(i).getFirstName());
-                    statement.execute();
+                    ClientRepository.addStoreCredit(clients.get(i));
 
                     break;
                 }
@@ -477,11 +309,7 @@ public abstract class RepairShopService
                 if(repaired == 1)
                 {
                     //region update paidRepairs atribute:
-                    String query = "UPDATE cars SET paidRepairs = ? WHERE registrationNumber = ?";
-                    PreparedStatement statement = connection.prepareStatement(query);
-                    statement.setString(1, String.valueOf(repaired));
-                    statement.setString(2, auxCar.getRegistrationNumber());
-                    statement.execute();
+                    CarsRepository.payRepairs(carsInShop.get(i).getRegistrationNumber());
                     //endregion
                 }
 
@@ -499,11 +327,7 @@ public abstract class RepairShopService
                 if(repaired == 1)
                 {
                     //region update paidRepairs atribute:
-                    String query = "UPDATE motorcycles SET paidRepairs = ? WHERE registrationNumber = ?";
-                    PreparedStatement statement = connection.prepareStatement(query);
-                    statement.setString(1, String.valueOf(repaired));
-                    statement.setString(2, auxMotorcycle.getRegistrationNumber());
-                    statement.execute();
+                    MotorcyclesRepository.payRepairs(motorcyclesInShop.get(i).getRegistrationNumber());
                     //endregion
                 }
 
@@ -529,13 +353,7 @@ public abstract class RepairShopService
         Employee auxEmployee = new Employee(name, firstName, Integer.parseInt(aux), Integer.parseInt(salary));
         employees.add(auxEmployee);
 
-        String query = "INSERT INTO employees (name, firstName, phoneNumber, salary) VALUES (?,?,?,?)";
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, auxEmployee.getName());
-        statement.setString(2, auxEmployee.getFirstName());
-        statement.setString(3, String.valueOf(auxEmployee.getPhoneNumber()));
-        statement.setString(4, String.valueOf(auxEmployee.getSalary()));
-        statement.execute();
+        EmployeesRepository.hireEmployee(auxEmployee);
 
         System.out.println("The Employee has been hired: ");
         System.out.println(auxEmployee);
@@ -581,11 +399,7 @@ public abstract class RepairShopService
 
         if(employees.remove(auxEmployee))
         {
-            String query = "DELETE FROM employees WHERE firstName = ? AND name = ?";
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.setString(1, auxEmployee.getFirstName());
-            statement.setString(2, auxEmployee.getName());
-            statement.execute();
+            EmployeesRepository.fireEmployee(auxEmployee);
 
             System.out.println("\nThe employee has been fired!");
 
@@ -716,52 +530,7 @@ public abstract class RepairShopService
                 manufacturer, model);
         carsInShop.add(carAux);
 
-        //region add Car to DB:
-        String query = "INSERT INTO cars (registrationNumber, color, isRepaired, fabricationYear, horsePower" +
-                ", ownerID, EmployeeID, manufacturer, model, paidRepairs) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, carAux.getRegistrationNumber());
-        statement.setString(2, carAux.getColor());
-        statement.setString(3, String.valueOf(0));
-        statement.setString(4, String.valueOf(carAux.getFabricationYear()));
-        statement.setString(5, String.valueOf(carAux.getHorsePower()));
-        statement.setString(6, String.valueOf(ClientID));
-        statement.setString(7, String.valueOf(EmployeeID));
-        statement.setString(8, carAux.getManufacturer());
-        statement.setString(9, carAux.getModel());
-        statement.setString(10, String.valueOf(0));
-        statement.execute();
-        //endregion
-
-        //region add the associative table rows in carIssues for the car:
-        query = "SELECT ID FROM cars WHERE registrationNumber = ?";
-        statement = connection.prepareStatement(query);
-        statement.setString(1, carAux.getRegistrationNumber());
-        ResultSet carIDResultSet = statement.executeQuery();
-        int carID = 0;
-
-        if(carIDResultSet.next())
-            carID = carIDResultSet.getInt("ID");
-
-        int issueID = 0;
-
-        for(int i = 0; i < issues.length; ++i)
-        {
-            query = "SELECT ID FROM issues WHERE issueName = ? and price = ?";
-            statement = connection.prepareStatement(query);
-            statement.setString(1, issues[i].getIssueName());
-            statement.setString(2, String.valueOf(issues[i].getPrice()));
-            ResultSet issueIDResultSet = statement.executeQuery();
-
-            if(issueIDResultSet.next())
-                issueID = issueIDResultSet.getInt("ID");
-
-            query = "INSERT INTO carIssues (IssueID, CarID) VALUES (?,?)";
-            statement = connection.prepareStatement(query);
-            statement.setString(1, String.valueOf(issueID));
-            statement.setString(2, String.valueOf(carID));
-            statement.execute();
-        }
+        CarsRepository.addNewCar(carAux, ClientID, EmployeeID, issues);
 
         //endregion
         System.out.println(carAux);
@@ -802,11 +571,7 @@ public abstract class RepairShopService
                 repairedCars.add(auxCar);
 
                 //region change isRepaired from DB:
-                String query = "UPDATE cars SET isRepaired = ? WHERE registrationNumber = ?";
-                PreparedStatement statement = connection.prepareStatement(query);
-                statement.setString(1, String.valueOf(1));
-                statement.setString(2, auxCar.getRegistrationNumber());
-                statement.execute();
+                CarsRepository.changeCarStatus(auxCar.getRegistrationNumber());
                 //endregion
 
                 break;
@@ -852,11 +617,7 @@ public abstract class RepairShopService
                 carsInShop.get(i).resoftVehicle(addedHorsePower);
                 System.out.println(carsInShop.get(i));
 
-                String query = "UPDATE cars SET horsePower = ? WHERE registrationNumber = ?";
-                PreparedStatement statement = connection.prepareStatement(query);
-                statement.setString(1, String.valueOf(carsInShop.get(i).getHorsePower()));
-                statement.setString(2, auxCar.getRegistrationNumber());
-                statement.execute();
+                CarsRepository.addHorsePowerToCar(carsInShop.get(i).getRegistrationNumber(), carsInShop.get(i).getHorsePower());
 
                 break;
             }
@@ -995,56 +756,8 @@ public abstract class RepairShopService
         motorcyclesInShop.add(motorcycleAux);
 
         //region add motorcycle to DB:
-        String query = "INSERT INTO motorcycles(registrationNumber, color, fabricationYear, horsePower" +
-                ", ownerID, EmployeeID, manufacturer, model, totalMass, transmissionType, paidRepairs, isRepaired) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, motorcycleAux.getRegistrationNumber());
-        statement.setString(2, motorcycleAux.getColor());
-        statement.setString(3, String.valueOf(motorcycleAux.getFabricationYear()));
-        statement.setString(4, String.valueOf(motorcycleAux.getHorsePower()));
-        statement.setString(5, String.valueOf(ClientID));
-        statement.setString(6, String.valueOf(EmployeeID));
-        statement.setString(7, motorcycleAux.getManufacturer());
-        statement.setString(8, motorcycleAux.getModel());
-        statement.setString(9, String.valueOf(motorcycleAux.getTotalMass()));
-        statement.setString(10, motorcycleAux.getTransmissionType());
-        statement.setString(11, String.valueOf(0));
-        statement.setString(12, String.valueOf(0));
-        statement.execute();
+        MotorcyclesRepository.addNewMotorcycle(motorcycleAux, ClientID, EmployeeID, issues);
         //endregion
-
-        //region add the associative table rows in motorcycleIssues for the motorcycle:
-        query = "SELECT ID FROM motorcycles WHERE registrationNumber = ?";
-        statement = connection.prepareStatement(query);
-        statement.setString(1, motorcycleAux.getRegistrationNumber());
-        ResultSet motorcycleIDResultSet = statement.executeQuery();
-        int motorcycleID = 0;
-
-        if(motorcycleIDResultSet.next())
-            motorcycleID = motorcycleIDResultSet.getInt("ID");
-
-        int issueID = 0;
-
-        for(int i = 0; i < issues.length; ++i)
-        {
-            query = "SELECT ID FROM issues WHERE issueName = ? and price = ?";
-            statement = connection.prepareStatement(query);
-            statement.setString(1, issues[i].getIssueName());
-            statement.setString(2, String.valueOf(issues[i].getPrice()));
-            ResultSet issueIDResultSet = statement.executeQuery();
-
-            if(issueIDResultSet.next())
-                issueID = issueIDResultSet.getInt("ID");
-
-            query = "INSERT INTO motorcycleIssues (IssueID, MotorcycleID) VALUES (?,?)";
-            statement = connection.prepareStatement(query);
-            statement.setString(1, String.valueOf(issueID));
-            statement.setString(2, String.valueOf(motorcycleID));
-            statement.execute();
-        }
-
-        //endregion
-
         System.out.println(motorcycleAux);
 
         writeActionInFile("AddANewMotorcycle", "VehiclesAudit.csv");
@@ -1083,11 +796,7 @@ public abstract class RepairShopService
                 repairedMotorcycles.add(auxMotorcycle);
 
                 //region change isRepaired from DB:
-                String query = "UPDATE motorcycles SET isRepaired = ? WHERE registrationNumber = ?";
-                PreparedStatement statement = connection.prepareStatement(query);
-                statement.setString(1, String.valueOf(1));
-                statement.setString(2, auxMotorcycle.getRegistrationNumber());
-                statement.execute();
+                MotorcyclesRepository.changeMotorcycleStatus(motorcyclesInShop.get(i).getRegistrationNumber());
                 //endregion
 
                 break;
@@ -1134,11 +843,8 @@ public abstract class RepairShopService
                 motorcyclesInShop.get(i).resoftVehicle(addedHorsePower);
                 System.out.println(motorcyclesInShop.get(i));
 
-                String query = "UPDATE motorcycles SET horsePower = ? WHERE registrationNumber = ?";
-                PreparedStatement statement = connection.prepareStatement(query);
-                statement.setString(1, String.valueOf(motorcyclesInShop.get(i).getHorsePower()));
-                statement.setString(2, auxMotorcycle.getRegistrationNumber());
-                statement.execute();
+                MotorcyclesRepository.addHorsePowerToMotorcycle(motorcyclesInShop.get(i).getRegistrationNumber(),
+                        motorcyclesInShop.get(i).getHorsePower());
 
                 break;
             }
