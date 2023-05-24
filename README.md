@@ -44,4 +44,6 @@ Example:
 
 <img width="510" alt="Screenshot 2023-04-03 at 20 02 41" src="https://user-images.githubusercontent.com/54707251/229578270-485a2195-6010-40d4-8eb8-b975b4ff8ead.png">
 
+I have added a DB connection to the app using PhpMyAdmin.  I did not use any SQL initialization, but have used the built-in interface.
 
+<img width="1283" alt="Screenshot 2023-05-24 at 17 02 46" src="https://github.com/Eclipsa2/CarServiceShop/assets/54707251/62615cec-360e-450c-ab78-ed0f630186de">
